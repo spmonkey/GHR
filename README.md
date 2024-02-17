@@ -27,3 +27,7 @@ GHR 常用参数:
 ## 报告截图
 
 ![report](picture/result_report.png)
+
+## 微信群截图
+
+![wechat](picture/wechat.png)

@@ -15,6 +15,16 @@ GitHub:
     https://github.com/spmonkey/
 '''
 # -*- coding: utf-8 -*-
+try:
+    from lib import install
+    result = install.install()
+    if result:
+        pass
+    else:
+        print(" [-] 模块安装失败！")
+except:
+    print(" [-] 模块安装失败！")
+
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
@@ -24,7 +34,6 @@ from requests.packages.urllib3 import disable_warnings;disable_warnings()
 from argparse import ArgumentParser
 
 from lib import logo
-from lib import install
 from lib import duplicate_removal
 from lib.vulnscan import vulnscan
 from lib.dirmap import dirmap
@@ -50,8 +59,12 @@ class GHR:
     def __init__(self, args):
         logo.logo()
         self.url = args.url
-        if self.url[-1] != "/" and "?" not in self.url:
-            self.url = self.url + "/"
+        if self.url:
+            if self.url[-1] != "/" and "?" not in self.url:
+                self.url = self.url + "/"
+        else:
+            print("[-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！")
+            return
         if args.thread:
             self.thread = args.thread
         else:
@@ -71,6 +84,7 @@ class GHR:
             "http": args.proxy,
             "https": args.proxy
         }
+        self.vuln_main()
 
     def url_queue(self):
         for url in self.url_list:
@@ -104,12 +118,7 @@ class GHR:
         result = vulnscan(url=self.ip, target=self.ip, proxy=self.proxies).main()
         self.results.append(result)
 
-    def install_modle(self):
-        result = install.install()
-        if result:
-            pass
-        else:
-            print(" [-] 模块安装失败！")
+
 
     def test_before_use(self):
         try:
@@ -128,8 +137,6 @@ class GHR:
         WW(self.url, result_list=result).main()
 
     def vuln_main(self):
-        self.install_modle()
-        print("")
         pool = Pool(int(self.thread))
         if self.url is not None:
             if self.test_before_use():
@@ -172,6 +179,5 @@ if __name__ == '__main__':
     # url = "http://192.168.111.136:6888/"
     # ghr = GHR(url=url, ip=ip, proxies=proxy)
 
-    ghr = GHR(args=args)
-    ghr.vuln_main()
+    GHR(args=args)
 
