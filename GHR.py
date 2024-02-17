@@ -15,15 +15,23 @@ GitHub:
     https://github.com/spmonkey/
 '''
 # -*- coding: utf-8 -*-
+from lib import logo
+import sys
+logo.logo()
+
 try:
+    print(" [*] 正在检测模块库安装及更新，请稍后......")
     from lib import install
     result = install.install()
     if result:
+        print(" [+] 模块库安装及更新已完成，请放心使用！\n")
         pass
     else:
-        print(" [-] 模块安装失败！")
+        print(" [-] 模块库安装及更新失败！")
+        sys.exit()
 except:
-    print(" [-] 模块安装失败！")
+    print(" [-] 模块库安装及更新失败！")
+    sys.exit()
 
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
@@ -33,7 +41,6 @@ import warnings;warnings.filterwarnings("ignore")
 from requests.packages.urllib3 import disable_warnings;disable_warnings()
 from argparse import ArgumentParser
 
-from lib import logo
 from lib import duplicate_removal
 from lib.vulnscan import vulnscan
 from lib.dirmap import dirmap
@@ -57,34 +64,33 @@ def argument():
 
 class GHR:
     def __init__(self, args):
-        logo.logo()
-        self.url = args.url
-        if self.url:
+        try:
+            self.url = args.url
             if self.url[-1] != "/" and "?" not in self.url:
                 self.url = self.url + "/"
-        else:
-            print("[-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！")
+            if args.thread:
+                self.thread = args.thread
+            else:
+                self.thread = 20
+            self.headers = {
+                'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            }
+            self.q = Queue()
+            self.order = args.nodir
+            self.url_list = []
+            self.results = []
+            self.high_cont = 0
+            self.middle_cont = 0
+            self.low_cont = 0
+            self.ip = args.ip
+            self.proxies = {
+                "http": args.proxy,
+                "https": args.proxy
+            }
+            self.vuln_main()
+        except:
+            print(" [-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！\n")
             return
-        if args.thread:
-            self.thread = args.thread
-        else:
-            self.thread = 20
-        self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
-        }
-        self.q = Queue()
-        self.order = args.nodir
-        self.url_list = []
-        self.results = []
-        self.high_cont = 0
-        self.middle_cont = 0
-        self.low_cont = 0
-        self.ip = args.ip
-        self.proxies = {
-            "http": args.proxy,
-            "https": args.proxy
-        }
-        self.vuln_main()
 
     def url_queue(self):
         for url in self.url_list:
@@ -118,8 +124,6 @@ class GHR:
         result = vulnscan(url=self.ip, target=self.ip, proxy=self.proxies).main()
         self.results.append(result)
 
-
-
     def test_before_use(self):
         try:
             result = requests.get(url=self.url, headers=self.headers, timeout=3, verify=False)
@@ -145,7 +149,7 @@ class GHR:
                         tasks = [pool.spawn(self.web_vuln, i) for i in range(int(self.thread))]
                         pool.join()
         elif self.ip is not None:
-            print("[*] 正在测试：{}".format(self.url))
+            print(" [*] 正在测试：{}".format(self.url))
             tasks = [pool.spawn(self.host_vuln, self.url) for i in range(int(self.thread))]
             pool.join()
         # 去重
@@ -173,11 +177,5 @@ class GHR:
 
 if __name__ == '__main__':
     args = argument()
-    # url = "http://127.0.0.1/sqli-labs/Less-1/?id=1"
-    # url = "http://127.0.0.1/spip"
-    # url = "http://127.0.0.1:8089/"
-    # url = "http://192.168.111.136:6888/"
-    # ghr = GHR(url=url, ip=ip, proxies=proxy)
-
     GHR(args=args)
 
