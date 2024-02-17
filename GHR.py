@@ -52,7 +52,6 @@ def argument():
     try:
         GHR_module = parser.add_argument_group("GHR 常用参数")
         GHR_module.add_argument('-u', '--url', type=str, default=None, help="url，例：--url http://127.0.0.1/")
-        GHR_module.add_argument('--ip', type=str, default=None, help="ip，例：--ip 127.0.0.1")
         GHR_module.add_argument('--nodir', action='store_true', help="禁用目录扫描")
         GHR_module.add_argument('--proxy', type=str, default=None, help="代理设置，例：--proxy 127.0.0.1:10809")
         GHR_module.add_argument('-t', '--thread', type=str, default=None, help="线程设置，例：--thread 10 默认线程数为：20")
@@ -66,8 +65,9 @@ class GHR:
     def __init__(self, args):
         try:
             self.url = args.url
-            if self.url[-1] != "/" and "?" not in self.url:
-                self.url = self.url + "/"
+            if self.url:
+                if self.url[-1] != "/" and "?" not in self.url:
+                    self.url = self.url + "/"
             if args.thread:
                 self.thread = args.thread
             else:
@@ -82,7 +82,6 @@ class GHR:
             self.high_cont = 0
             self.middle_cont = 0
             self.low_cont = 0
-            self.ip = args.ip
             self.proxies = {
                 "http": args.proxy,
                 "https": args.proxy
@@ -120,10 +119,6 @@ class GHR:
                     self.url_list.append(url)
         return True
 
-    def host_vuln(self, i):
-        result = vulnscan(url=self.ip, target=self.ip, proxy=self.proxies).main()
-        self.results.append(result)
-
     def test_before_use(self):
         try:
             result = requests.get(url=self.url, headers=self.headers, timeout=3, verify=False)
@@ -142,16 +137,11 @@ class GHR:
 
     def vuln_main(self):
         pool = Pool(int(self.thread))
-        if self.url is not None:
-            if self.test_before_use():
-                if self.dirb_scan():
-                    if self.url_queue():
-                        tasks = [pool.spawn(self.web_vuln, i) for i in range(int(self.thread))]
-                        pool.join()
-        elif self.ip is not None:
-            print(" [*] 正在测试：{}".format(self.url))
-            tasks = [pool.spawn(self.host_vuln, self.url) for i in range(int(self.thread))]
-            pool.join()
+        if self.test_before_use():
+            if self.dirb_scan():
+                if self.url_queue():
+                    tasks = [pool.spawn(self.web_vuln, i) for i in range(int(self.thread))]
+                    pool.join()
         # 去重
         result = duplicate_removal.duplicate_removal(self.results).dr()
         result_text = result[0]
