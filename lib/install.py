@@ -19,12 +19,25 @@ import os
 
 
 def install():
-    upgrade = os.popen("python -m pip install --upgrade pip").read()
-    if "Successfully" in upgrade or "Requirement already" in upgrade:
-        pass
-    install_molde = os.popen("pip3 install python-docx argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-    if "Successfully" in install_molde or "Requirement already" in install_molde:
-        return True
-    else:
-        return False
+    try:
+        upgrade = os.popen("python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
+        if "Successfully" in upgrade or "Requirement already" in upgrade:
+            pass
+        install_molde = os.popen("pip3 install python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
+        if "Successfully" in install_molde or "Requirement already" in install_molde:
+            return True
+        else:
+            return False
+    except:
+        try:
+            upgrade = os.popen("python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
+            if "Successfully" in upgrade or "Requirement already" in upgrade:
+                pass
+            install_molde = os.popen("pip3 install python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
+            if "Successfully" in install_molde or "Requirement already" in install_molde:
+                return True
+            else:
+                return False
+        except:
+            return False
 
