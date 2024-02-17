@@ -19,7 +19,7 @@ GHR 常用参数:
 
 ```
 
-![running](picture/help.png)
+![help](picure/help.png)
 
 ## 运行截图
 
