@@ -23,6 +23,7 @@ from requests.packages.urllib3 import disable_warnings
 from urllib.parse import urlparse
 import requests
 import os
+import sys
 disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,7 +39,10 @@ class dirmap:
         self.q = Queue()
         self.order = order
         self.path_list = []
-        self.dictionarys = open(path + "\\library\\dicc.txt").readlines()
+        if sys.platform.startswith("win"):
+            self.dictionarys = open(path + "\\library\\dicc.txt").readlines()
+        else:
+            self.dictionarys = open(path + "/library/dicc.txt").readlines()
         self.proxies = proxies
 
     def dictionarys_queue(self):

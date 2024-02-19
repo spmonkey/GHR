@@ -18,6 +18,7 @@ GitHub:
 import docx
 import os
 import re
+import sys
 from urllib.parse import urlparse
 from docx.oxml.ns import qn
 
@@ -63,7 +64,10 @@ class WW:
         return True
 
     def neaten(self):
-        vuln_descriptions = open("{}\\library\\vuln_description.txt".format(self.file_path), "r", encoding="utf-8").readlines()
+        if sys.platform.startswith("win"):
+            vuln_descriptions = open("{}\\library\\vuln_description.txt".format(self.file_path), "r", encoding="utf-8").readlines()
+        else:
+            vuln_descriptions = open("{}/library/vuln_description.txt".format(self.file_path), "r", encoding="utf-8").readlines()
         for vuln_description in vuln_descriptions:
             all = vuln_description.strip().split("：")
             self.vuln_descriptions[all[0]] = all[1]
@@ -74,14 +78,20 @@ class WW:
                 else:
                     self.result_dicts[vulnname]["漏洞位置"].append(result_list[vulnname]["漏洞位置"])
                     self.result_dicts[vulnname]["漏洞请求"].append(result_list[vulnname]["漏洞请求"])
-        repair_suggestions = open("{}\\library\\repair_suggestion.txt".format(self.file_path), "r", encoding="utf-8").readlines()
+        if sys.platform.startswith("win"):
+            repair_suggestions = open("{}\\library\\repair_suggestion.txt".format(self.file_path), "r", encoding="utf-8").readlines()
+        else:
+            repair_suggestions = open("{}/library/repair_suggestion.txt".format(self.file_path), "r", encoding="utf-8").readlines()
         for repair_suggestion in repair_suggestions:
             all = repair_suggestion.strip().split(":")
             self.repair_suggestions[all[0]] = all[1]
         return True
 
     def writeword(self):
-        full_path = os.path.join(self.file_path + "\\report", self.file_name + ".docx")
+        if sys.platform.startswith("win"):
+            full_path = os.path.join(self.file_path + "\\report", self.file_name + ".docx")
+        else:
+            full_path = os.path.join(self.file_path + "/report", self.file_name + ".docx")
         if os.path.exists(full_path):
             os.remove(full_path)
         doc = docx.Document()
