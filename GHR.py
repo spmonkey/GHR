@@ -127,6 +127,7 @@ class GHR:
         result = up().ghr_upgrade()
         if result:
             print("\n\n [+] 更新已完成\n")
+            sys.exit()
 
     def test_before_use(self):
         try:
