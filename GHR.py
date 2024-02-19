@@ -45,6 +45,7 @@ from lib import duplicate_removal
 from lib.vulnscan import vulnscan
 from lib.dirmap import dirmap
 from lib.writeword import WW
+from lib.upgrade import up
 
 
 def argument():
@@ -54,6 +55,7 @@ def argument():
         GHR_module.add_argument('-u', '--url', type=str, default=None, help="url，例：--url http://127.0.0.1/")
         GHR_module.add_argument('--nodir', action='store_true', help="禁用目录扫描")
         GHR_module.add_argument('--proxy', type=str, default=None, help="代理设置，例：--proxy 127.0.0.1:10809")
+        GHR_module.add_argument('--upgrade', action='store_true', help="更新参数")
         GHR_module.add_argument('-t', '--thread', type=str, default=None, help="线程设置，例：--thread 10 默认线程数为：20")
         args = parser.parse_args()
         return args
@@ -63,6 +65,8 @@ def argument():
 
 class GHR:
     def __init__(self, args):
+        if args.upgrade:
+            self.updata()
         try:
             self.url = args.url
             if self.url[-1] != "/" and "?" not in self.url:
@@ -117,6 +121,12 @@ class GHR:
                 if url not in self.url_list:
                     self.url_list.append(url)
         return True
+
+    def updata(self):
+        print(" [*] 正在检测更新，请稍后...\n")
+        result = up().ghr_upgrade()
+        if result:
+            print("\n\n [+] 更新已完成\n")
 
     def test_before_use(self):
         try:
