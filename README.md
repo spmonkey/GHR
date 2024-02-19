@@ -13,13 +13,14 @@ options:
 GHR 常用参数:
   -u URL, --url URL     url，例：--url http://127.0.0.1/
   --nodir               禁用目录扫描
+  --upgrade             更新
   --proxy PROXY         代理设置，例：--proxy 127.0.0.1:10809（目前仅支持HTTP，暂不支持SOCKET）
   -t THREAD, --thread THREAD
                         线程设置，例：--thread 10 默认线程数为：20
 
 ```
 
-![help](picure/help.png)
+![running](picture/help.png)
 
 ## 运行截图
 
