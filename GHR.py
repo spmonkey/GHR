@@ -65,9 +65,8 @@ class GHR:
     def __init__(self, args):
         try:
             self.url = args.url
-            if self.url:
-                if self.url[-1] != "/" and "?" not in self.url:
-                    self.url = self.url + "/"
+            if self.url[-1] != "/" and "?" not in self.url:
+                self.url = self.url + "/"
             if args.thread:
                 self.thread = args.thread
             else:
