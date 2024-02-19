@@ -136,7 +136,10 @@ class WW:
             req_run._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
             for vuln_request in self.result_dicts[vulnname]["漏洞请求"]:
                 doc.add_paragraph(vuln_request)
-            doc.save(self.file_path+"\\report\\{}.docx".format(self.file_name))
+            if sys.platform.startswith("win"):
+                doc.save(self.file_path+"\\report\\{}.docx".format(self.file_name))
+            else:
+                doc.save(self.file_path+"/report/{}.docx".format(self.file_name))
             sug = doc.add_heading("", level=3)
             sug_run = sug.add_run("修复建议")
             sug_run.font.name = u'宋体'
@@ -147,8 +150,14 @@ class WW:
             else:
                 for repair_suggestion in self.repair_suggestions[vuln + "漏洞"].split("\\n"):
                     doc.add_paragraph(repair_suggestion)
-            doc.save(self.file_path + "\\report\\{}.docx".format(self.file_name))
-        print("报告生成成功，报告路径为：{}".format(self.file_path+"\\report\\{}.docx".format(self.file_name)))
+            if sys.platform.startswith("win"):
+                doc.save(self.file_path+"\\report\\{}.docx".format(self.file_name))
+            else:
+                doc.save(self.file_path+"/report/{}.docx".format(self.file_name))
+        if sys.platform.startswith("win"):
+            print("报告生成成功，报告路径为：{}".format(self.file_path+"\\report\\{}.docx".format(self.file_name)))
+        else:
+            print("报告生成成功，报告路径为：{}".format(self.file_path+"/report/{}.docx".format(self.file_name)))
 
     def main(self):
         if self.sort():
