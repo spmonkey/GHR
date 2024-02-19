@@ -55,7 +55,7 @@ class dirmap:
         while True:
             if self.q.qsize() == 0:
                 return
-            path = self.q.get()
+            path = self.q.get_nowait()
             url = self.url + path
             try:
                 result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies, allow_redirects=False)
