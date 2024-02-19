@@ -66,7 +66,7 @@ class poc:
             result_text = ""
             if self.q.qsize() == 0:
                 break
-            api = self.q.get()
+            api = self.q.get_nowait()
             url_api = api.split('.')
             length = len(url_api)
             iup = 'http://'
