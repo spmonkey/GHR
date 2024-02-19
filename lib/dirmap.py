@@ -39,6 +39,7 @@ class dirmap:
         self.q = Queue()
         self.order = order
         self.path_list = []
+        self.over_path = []
         if sys.platform.startswith("win"):
             self.dictionarys = open(path + "\\library\\dicc.txt").readlines()
         else:
@@ -102,9 +103,15 @@ class dirmap:
                     self.path_list.append(href)
 
     def filtration(self):
+        paths = []
         for path in self.path_list:
-            if path.count("http:") > 1 or path.count("https:") > 1:
-                self.path_list.remove(path)
+            if path.count("http:") == 1 and path.count("https:") == 1:
+                paths.append(path)
+            elif path.count("http:") > 1 or path.count("https:") > 1:
+                paths.append(path)
+        for path in self.path_list:
+            if path not in paths:
+                self.over_path.append(path)
 
     def main(self):
         if self.order:
@@ -114,6 +121,5 @@ class dirmap:
                 pool.join()
         self.crawler()
         self.filtration()
-        return self.path_list
-
+        return self.over_path
 
