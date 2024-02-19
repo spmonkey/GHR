@@ -46,7 +46,7 @@ class poc:
         }
         try:
             result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            if 'name="login-submit"' not in result.text:
+            if 'name="login-submit"' not in result.text and result.status_code == 200:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在弱口令漏洞\033[0m
                  POST {} HTTP/1.1
