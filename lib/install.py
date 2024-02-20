@@ -23,10 +23,12 @@ def install():
         upgrade = os.popen("python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
         if "Successfully" in upgrade or "Requirement already" in upgrade:
             pass
-        uninstall = os.popen("pip3 uninstall -y urllib3 docx chardet")
+        os.popen("pip3 uninstall -y urllib3")
+        os.popen("pip3 uninstall -y docx")
+        os.popen("pip3 uninstall -y chardet")
         install_molde = os.popen("pip3 install wget python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
         if "Successfully" in install_molde or "Requirement already" in install_molde:
-            os.popen("pip3 install --upgrade requests")
+            os.popen("pip3 install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple")
             return True
         else:
             return False
@@ -35,10 +37,12 @@ def install():
             upgrade = os.popen("python3 -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
             if "Successfully" in upgrade or "Requirement already" in upgrade:
                 pass
-            uninstall = os.popen("pip3 uninstall -y urllib3 docx chardet")
+            os.popen("pip3 uninstall -y urllib3")
+            os.popen("pip3 uninstall -y docx")
+            os.popen("pip3 uninstall -y chardet")
             install_molde = os.popen("pip3 install urllib3 wget chardet python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
             if "Successfully" in install_molde or "Requirement already" in install_molde:
-                os.popen("pip3 install --upgrade requests")
+                os.popen("pip3 install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple")
                 return True
             else:
                 return False
