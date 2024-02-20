@@ -49,7 +49,7 @@ class poc:
             result_text = ""
             if self.q.qsize() == 0:
                 break
-            path = self.q.get()
+            path = self.q.get_nowait()
             target_url = "{}/{}".format(url, path)
             try:
                 result = requests.get(url=target_url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)

@@ -52,7 +52,7 @@ class poc:
             result_text = ""
             if self.q.qsize() == 0:
                 break
-            payload = self.q.get()
+            payload = self.q.get_nowait()
             try:
                 url = "{}{}".format(url, payload)
                 result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
