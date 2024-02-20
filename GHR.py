@@ -15,13 +15,13 @@ GitHub:
     https://github.com/spmonkey/
 '''
 # -*- coding: utf-8 -*-
-from lib import logo
+from module import logo
 import sys
 logo.logo()
 
 try:
     print(" [*] 正在检测模块库安装及更新，请稍后......")
-    from lib import install
+    from module import install
     result = install.install()
     if result:
         print(" [+] 模块库安装及更新已完成，请放心使用！\n")
@@ -41,11 +41,11 @@ import warnings;warnings.filterwarnings("ignore")
 from requests.packages.urllib3 import disable_warnings;disable_warnings()
 from argparse import ArgumentParser
 
-from lib import duplicate_removal
-from lib.vulnscan import vulnscan
-from lib.dirmap import dirmap
-from lib.writeword import WW
-from lib.upgrade import up
+from module import duplicate_removal
+from module.vulnscan import vulnscan
+from module.dirmap import dirmap
+from module.writeword import WW
+from module.upgrade import up
 
 
 def argument():
@@ -127,7 +127,6 @@ class GHR:
         result = up().ghr_upgrade()
         if result:
             print("\n\n [+] 更新已完成\n")
-            sys.exit()
 
     def test_before_use(self):
         try:
