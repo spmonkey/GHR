@@ -26,7 +26,7 @@ def install():
         os.popen("pip3 uninstall -y urllib3").read()
         os.popen("pip3>nul 2>nul uninstall -y docx").read()
         os.popen("pip3 uninstall -y chardet").read()
-        install_molde = os.popen("pip3 install wget python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
+        install_molde = os.popen("pip3 install urllib3 chardet wget python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
         if "Successfully" in install_molde or "Requirement already" in install_molde:
             os.popen("pip3 install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
             return True
