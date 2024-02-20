@@ -15,13 +15,13 @@ GitHub:
     https://github.com/spmonkey/
 '''
 # -*- coding: utf-8 -*-
-from module import logo
+from modules import logo
 import sys
 logo.logo()
 
 try:
     print(" [*] 正在检测模块库安装及更新，请稍后......")
-    from module import install
+    from modules import install
     result = install.install()
     if result:
         print(" [+] 模块库安装及更新已完成，请放心使用！\n")
@@ -41,11 +41,11 @@ import warnings;warnings.filterwarnings("ignore")
 from requests.packages.urllib3 import disable_warnings;disable_warnings()
 from argparse import ArgumentParser
 
-from module import duplicate_removal
-from module.vulnscan import vulnscan
-from module.dirmap import dirmap
-from module.writeword import WW
-from module.upgrade import up
+from modules import duplicate_removal
+from modules.vulnscan import vulnscan
+from modules.dirmap import dirmap
+from modules.writeword import WW
+from modules.upgrade import up
 
 
 def argument():
@@ -103,7 +103,7 @@ class GHR:
         while True:
             if self.q.qsize() == 0:
                 return
-            url = self.q.get()
+            url = self.q.get_nowait()
             result = vulnscan(url=url, target=self.url, proxy=self.proxies).main()
             self.results.append(result)
 
