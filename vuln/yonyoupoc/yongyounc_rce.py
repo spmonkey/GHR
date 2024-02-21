@@ -16,6 +16,7 @@ GitHub:
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
+import gevent
 import requests
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
@@ -52,7 +53,7 @@ class poc:
             path = self.q.get()
             target_url = "{}/{}".format(url, path)
             try:
-                result = requests.get(url=target_url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=target_url, headers=self.headers, verify=False, proxies=self.proxies)
                 if "BeanShell" in result.text:
                     target = urlparse(target_url)
                     result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞\033[0m
