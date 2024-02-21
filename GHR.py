@@ -89,10 +89,10 @@ class GHR:
                 "http": args.proxy,
                 "https": args.proxy
             }
-            self.vuln_main()
         except:
             print(" [-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！\n")
             return
+        self.vuln_main()
 
     def url_queue(self):
         for url in self.url_list:
