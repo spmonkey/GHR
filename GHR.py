@@ -37,6 +37,7 @@ from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
 import requests
+import os
 import warnings;warnings.filterwarnings("ignore")
 from requests.packages.urllib3 import disable_warnings;disable_warnings()
 from argparse import ArgumentParser
@@ -89,7 +90,8 @@ class GHR:
                 "http": args.proxy,
                 "https": args.proxy
             }
-        except:
+        except Exception as e:
+            print(e)
             print(" [-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！\n")
             return
         self.vuln_main()
@@ -123,8 +125,9 @@ class GHR:
         return True
 
     def updata(self):
-        print(" [*] 正在检测更新，请稍后...\n")
-        result = up().ghr_upgrade()
+        print(" [*] 正在检测更新，请稍后...")
+        path = os.getcwd()
+        result = up(path).ghr_upgrade()
         if result:
             print(" [+] 更新已完成\n")
             sys.exit()
