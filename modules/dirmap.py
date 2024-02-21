@@ -21,6 +21,7 @@ from gevent.queue import Queue
 from bs4 import BeautifulSoup
 from requests.packages.urllib3 import disable_warnings
 from urllib.parse import urlparse
+import gevent
 import requests
 import os
 import sys
@@ -58,9 +59,10 @@ class dirmap:
             path = self.q.get_nowait()
             url = self.url + path
             try:
-                result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies, allow_redirects=False)
-                if result.status_code == 200 and url not in self.path_list:
-                    self.path_list.append(url)
+                with gevent.Timeout(3, False) as timeout:
+                    result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies, allow_redirects=False)
+                    if result.status_code == 200 and url not in self.path_list:
+                        self.path_list.append(url)
             except:
                 pass
 
