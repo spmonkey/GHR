@@ -90,8 +90,7 @@ class GHR:
                 "http": args.proxy,
                 "https": args.proxy
             }
-        except Exception as e:
-            print(e)
+        except:
             print(" [-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！\n")
             return
         self.vuln_main()
@@ -111,13 +110,13 @@ class GHR:
 
     def dirb_scan(self):
         if self.order:
-            result = dirmap(self.url, self.proxies, order=False).main()
+            result = dirmap(self.url, self.proxies, thread=self.thread, order=False).main()
             self.url_list.append(self.url)
             for url in result:
                 if url not in self.url_list:
                     self.url_list.append(url)
         else:
-            result = dirmap(url=self.url, proxies=self.proxies).main()
+            result = dirmap(url=self.url, proxies=self.proxies, thread=self.thread).main()
             self.url_list.append(self.url)
             for url in result:
                 if url not in self.url_list:
