@@ -30,7 +30,7 @@ path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class dirmap:
-    def __init__(self, url, proxies, order=True):
+    def __init__(self, url, proxies, thread, order=True):
         self.url = url
         if self.url[-1] != "/" and order:
             self.url += "/"
@@ -39,6 +39,7 @@ class dirmap:
         }
         self.q = Queue()
         self.order = order
+        self.thread = thread
         self.path_list = []
         self.over_path = []
         if sys.platform.startswith("win"):
@@ -117,9 +118,9 @@ class dirmap:
 
     def main(self):
         if self.order:
-            pool = Pool(50)
+            pool = Pool(self.thread)
             if self.dictionarys_queue():
-                task = [pool.spawn(self.dirmap, i) for i in range(50)]
+                task = [pool.spawn(self.dirmap, i) for i in range(self.thread)]
                 pool.join()
         self.crawler()
         self.filtration()
