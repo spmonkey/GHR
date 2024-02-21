@@ -48,7 +48,7 @@ class vulnscan:
         while True:
             if self.q.qsize() == 0:
                 return
-            model = self.q.get_nowait()
+            model = self.q.get()
             if "poc" in str(model):
                 if self.url == self.target:
                     result = model.poc(self.url, self.proxies).main()
