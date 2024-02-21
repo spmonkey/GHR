@@ -60,10 +60,9 @@ class dirmap:
             path = self.q.get_nowait()
             url = self.url + path
             try:
-                with gevent.Timeout(3, False) as timeout:
-                    result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies, allow_redirects=False)
-                    if result.status_code == 200 and url not in self.path_list:
-                        self.path_list.append(url)
+                result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies, allow_redirects=False)
+                if result.status_code == 200 and url not in self.path_list:
+                    self.path_list.append(url)
             except:
                 pass
 
