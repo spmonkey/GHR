@@ -22,6 +22,8 @@ import shutil
 
 
 class up:
+    def __init__(self, path):
+        self.path = path
 
     def ghr_upgrade(self):
         try:
@@ -31,8 +33,7 @@ class up:
                 zip_ref.extractall("../")
 
             os.remove(filename)
-            path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            self.recursive_folder(path)
+            self.recursive_folder(self.path)
             return True
         except:
             print(" [-] 更新失败，但是不影响使用，如果需要更新，请重新运行：python GHR.py --upgrade\n")
