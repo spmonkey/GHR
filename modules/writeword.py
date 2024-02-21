@@ -83,7 +83,10 @@ class WW:
         else:
             repair_suggestions = open("{}/library/repair_suggestion.txt".format(self.file_path), "r", encoding="utf-8").readlines()
         for repair_suggestion in repair_suggestions:
-            all = repair_suggestion.strip().split(":")
+            if "JavaScript框架库漏洞" in repair_suggestion:
+                all = repair_suggestion.strip().split("：")
+            else:
+                all = repair_suggestion.strip().split(":")
             self.repair_suggestions[all[0]] = all[1]
         return True
 
