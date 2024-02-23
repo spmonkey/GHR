@@ -205,7 +205,7 @@ class GHR:
                 self.middle_cont = 0
                 self.low_cont = 0
                 self.flag = False
-        else:
+        elif self.url is not None:
             if self.test_before_use(self.url):
                 sys.stdout.write("\n")
                 self.dirb_scan(self.url, count=0, unfinished=0)
@@ -251,6 +251,9 @@ class GHR:
             else:
                 print("\n共发现 \033[31m高危漏洞：{}\033[0m，\033[33m中危漏洞：{}\033[0m，\033[32m低危漏洞：{}\033[0m\n当前系统很安全".format(self.high_cont, self.middle_cont, self.low_cont))
             print("")
+        else:
+            print(" [-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！\n")
+            return
 
 
 if __name__ == '__main__':
