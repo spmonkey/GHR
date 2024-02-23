@@ -39,3 +39,9 @@ GHR 常用参数:
 ## 微信群截图
 
 ![wechat](picture/wechat.png)
+
+## 模块库安装
+
+```
+pip install -r requirements.txt
+```
