@@ -27,10 +27,10 @@ try:
         print(" [+] 模块库安装及更新已完成，请放心使用！\n")
         pass
     else:
-        print(" [-] 模块库安装及更新失败！")
+        print(" [-] 模块库安装及更新失败！请使用python3运行该程序！")
         sys.exit()
 except:
-    print(" [-] 模块库安装及更新失败！")
+    print(" [-] 模块库安装及更新失败！请使用python3运行该程序！")
     sys.exit()
 
 from gevent import monkey;monkey.patch_all()
