@@ -19,20 +19,6 @@ from modules import logo
 import sys
 logo.logo()
 
-try:
-    print(" [*] 正在检测模块库安装及更新，请稍后......")
-    from modules import install
-    result = install.install()
-    if result:
-        print(" [+] 模块库安装及更新已完成，请放心使用！\n")
-        pass
-    else:
-        print(" [-] 模块库安装及更新失败！请使用python3运行该程序！")
-        sys.exit()
-except:
-    print(" [-] 模块库安装及更新失败！请使用python3运行该程序！")
-    sys.exit()
-
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
