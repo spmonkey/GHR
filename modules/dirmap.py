@@ -22,6 +22,7 @@ from bs4 import BeautifulSoup
 from requests.packages.urllib3 import disable_warnings
 from urllib.parse import urlparse
 import gevent
+import time
 import requests
 import os
 import sys
@@ -40,8 +41,10 @@ class dirmap:
         self.q = Queue()
         self.order = order
         self.thread = thread
+        self.symbol = ['|', '/', '-', '\\', '|', '/', '-', '\\']
         self.path_list = []
         self.over_path = []
+        self.flag = False
         if sys.platform.startswith("win"):
             self.dictionarys = open(path + "\\library\\dicc.txt").readlines()
         else:
@@ -56,7 +59,7 @@ class dirmap:
     def dirmap(self, x):
         while True:
             if self.q.qsize() == 0:
-                return
+                return True
             path = self.q.get_nowait()
             url = self.url + path
             try:
@@ -115,12 +118,44 @@ class dirmap:
             if path not in paths:
                 self.over_path.append(path)
 
-    def main(self):
+    def main(self, count, unfinished):
         if self.order:
             pool = Pool(self.thread)
+            jobs = []
             if self.dictionarys_queue():
-                task = [pool.spawn(self.dirmap, i) for i in range(self.thread)]
-                pool.join()
+                for i in range(self.thread):
+                    task = pool.spawn(self.dirmap, i)
+                    jobs.append(task)
+                while not self.flag:
+                    if count == 0 and unfinished == 0:
+                        for dot in range(0, 8):
+                            symbolnum = dot
+                            if dot == 7:
+                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{" " * 10}''')
+                                sys.stdout.write("\033[F" * 1)
+                                time.sleep(1)
+                            else:
+                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{"." * (dot + 1)}''')
+                                sys.stdout.write("\033[F" * 1)
+                                time.sleep(1)
+                    else:
+                        for dot in range(0, 8):
+                            symbolnum = dot
+                            if dot == 7:
+                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{" " * 10}
+ [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
+                                sys.stdout.write("\033[F" * 2)
+                                time.sleep(1)
+                            else:
+                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{"." * (dot + 1)}
+ [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
+                                sys.stdout.write("\033[F" * 2)
+                                time.sleep(1)
+                    for job in jobs:
+                        if job.ready():
+                            self.flag = True
+                            break
+        print("\r", end="")
         self.crawler()
         self.filtration()
         return self.over_path

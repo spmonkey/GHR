@@ -36,7 +36,7 @@ class up:
             self.recursive_folder(self.path)
             return True
         except:
-            print(" [-] 更新失败，但是不影响使用，如果需要更新，请重新运行：python GHR.py --upgrade\n")
+            print(" [-] 更新失败，但是不影响使用，如果需要更新，请重新运行：python GHR.py --upgrade 或者 python3 GHR.py --upgrade\n")
             return False
 
     def recursive_folder(self, path):

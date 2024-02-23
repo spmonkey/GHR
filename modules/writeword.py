@@ -111,12 +111,15 @@ class WW:
             else:
                 vuln = vulnname
             if "OPTIONS" in vuln:
-                vuln_name_run = vuln_name_add.add_run(vuln)
+                vuln_name_run = vuln_name_add.add_run(vuln + "（低危）")
             else:
                 if ":" in vulnname:
-                    vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + cve)
+                    vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + cve + "（高危）")
                 else:
-                    vuln_name_run = vuln_name_add.add_run(vuln + "漏洞")
+                    if "JavaScript" in vulnname or "Host头" in vulnname:
+                        vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + "（中危）")
+                    else:
+                        vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + "（高危）")
             vuln_name_run.font.name = u'宋体'
             vuln_name_run._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
             describe = doc.add_heading("", level=3)

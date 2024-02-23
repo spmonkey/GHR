@@ -5,13 +5,14 @@ Golden-hooped Rod是一款对于web站点进行漏洞扫描的工具。工具使
 ## 使用方法
 
 ```
-usage: GHR.py [-h] [-u URL] [--ip IP] [--nodir] [--proxy PROXY] [-t THREAD]
+usage: GHR.py [-h] [-u URL] [-f filename] [--upgrade] [--nodir] [--proxy PROXY] [-t THREAD]
 
 options:
   -h, --help            show this help message and exit
 
 GHR 常用参数:
-  -u URL, --url URL     url，例：--url http://127.0.0.1/
+  -u URL, --url URL     url，例：--url http://127.0.0.1/，注：url中不能添加文件名，如index.html、index.php等，如需添加文件名，请禁用目录扫描
+  -f file, --file file  批量url文件名，例：--file url.txt，注：文件中的url不能添加文件名，如index.html、index.php等，如需添加文件名，请禁用目录扫描
   --nodir               禁用目录扫描
   --upgrade             更新
   --proxy PROXY         代理设置，例：--proxy 127.0.0.1:10809（目前仅支持HTTP，暂不支持SOCKET）
@@ -22,9 +23,14 @@ GHR 常用参数:
 
 ![help](picture/help.png)
 
-## 运行截图
+## 单个url运行截图
 
 ![running](picture/running.png)
+
+## 批量url运行截图
+
+![batch](picture/more_running.png)
+![batch_result](picture/more_result.png)
 
 ## 报告截图
 
