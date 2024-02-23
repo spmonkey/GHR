@@ -15,27 +15,41 @@ GitHub:
     https://github.com/spmonkey/
 '''
 # -*- coding: utf-8 -*-
-import os
+import subprocess
 
 
 def install():
     try:
-        upgrade = os.popen("python>nul 2>nul -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-        os.popen("pip3>nul 2>nul uninstall -y urllib3").read()
-        os.popen("pip3>nul 2>nul uninstall -y docx").read()
-        os.popen("pip3>nul 2>nul uninstall -y chardet").read()
-        install_molde = os.popen("pip3>nul 2>nul install urllib3 chardet wget python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-        os.popen("pip3>nul 2>nul install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-        return True
-    except:
-        try:
-            upgrade = os.popen("python3>nul 2>nul -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-            os.popen("pip3>nul 2>nul uninstall -y urllib3").read()
-            os.popen("pip3>nul 2>nul uninstall -y docx").read()
-            os.popen("pip3>nul 2>nul uninstall -y chardet").read()
-            install_molde = os.popen("pip3>nul 2>nul install urllib3 wget chardet python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-            os.popen("pip3>nul 2>nul install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple").read()
-            return True
-        except:
+        result = subprocess.run("python --version", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if result.returncode == 0:
+            if " 3." in result.stdout.decode('utf-8'):
+                upgrade = subprocess.run("python>nul 2>nul -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.run("pip3>nul 2>nul uninstall -y urllib3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.run("pip3>nul 2>nul uninstall -y docx", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.run("pip3>nul 2>nul uninstall -y chardet", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                install_molde = subprocess.run("pip3 install urllib3 chardet wget python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.run("pip3>nul 2>nul install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if install_molde.returncode != 0:
+                    return False
+                else:
+                    return True
+            else:
+                try:
+                    upgrade = subprocess.run("python3>nul 2>nul -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.run("pip3>nul 2>nul uninstall -y urllib3", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.run("pip3>nul 2>nul uninstall -y docx", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.run("pip3>nul 2>nul uninstall -y chardet", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    install_molde = subprocess.run("pip3 install urllib3 wget chardet python-docx requests argparse gevent bs4 lxml -i https://pypi.tuna.tsinghua.edu.cn/simple", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.run(
+                        "pip3>nul 2>nul install --upgrade requests -i https://pypi.tuna.tsinghua.edu.cn/simple", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    if install_molde.returncode != 0:
+                        return False
+                    else:
+                        return True
+                except:
+                    return False
+        else:
             return False
+    except:
+        return False
 
