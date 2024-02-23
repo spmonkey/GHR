@@ -53,10 +53,7 @@ class poc:
                  Host: {}""".format(target.path, target.netloc)
                 for request_type, request_text in dict(result1.request.headers).items():
                     self.result_text += "\n                 {}: {}".format(request_type, request_text)
-                for param, value in data1.items():
-                    values = param + "=" + value
-                    self.value_list.append(values)
-                self.result_text += "\n\n                 {}".format("&".join(self.value_list))
+                self.result_text += "\n\n                 {}".format(data1)
                 return True
             else:
                 result2 = requests.post(url=url, data=data2, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
@@ -67,10 +64,7 @@ class poc:
                      Host: {}""".format(target.path, target.netloc)
                     for request_type, request_text in dict(result2.request.headers).items():
                         self.result_text += "\n                 {}: {}".format(request_type, request_text)
-                    for param, value in data2.items():
-                        values = param + "=" + value
-                        self.value_list.append(values)
-                    self.result_text += "\n\n                 {}".format("&".join(self.value_list))
+                    self.result_text += "\n\n                 {}".format(data2)
                     return True
                 else:
                     return False

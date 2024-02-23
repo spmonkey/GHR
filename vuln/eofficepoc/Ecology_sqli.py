@@ -53,8 +53,8 @@ class poc:
             if "time out" in str(e):
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m
-                     POST {} HTTP/1.1
-                     Host: {}
+                 POST {} HTTP/1.1
+                 Host: {}
     {}""".format(target.path, target.netloc, self.request_headers)
                 for param, value in data.items():
                     values = param + "=" + value

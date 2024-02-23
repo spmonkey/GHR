@@ -16,9 +16,8 @@ GitHub:
 '''
 # -*- coding: utf-8 -*-
 import requests
-import re, platform, os
-from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 

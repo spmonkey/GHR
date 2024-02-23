@@ -22,7 +22,6 @@ from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 
-
 class poc:
     def __init__(self, url, proxies):
         self.url = url

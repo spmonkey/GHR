@@ -16,7 +16,6 @@ GitHub:
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
-import gevent
 import requests
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings

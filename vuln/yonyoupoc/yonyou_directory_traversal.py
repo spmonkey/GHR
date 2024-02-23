@@ -61,3 +61,14 @@ class poc:
             return self.result_text
         else:
             return False
+
+
+if __name__ == '__main__':
+    urls = open("D:\\work\\Characterized_by_open_content\\hscsec\\GHR\\vuln\\yonyoupoc\\yonyou.txt", "r", encoding="utf-8").readlines()
+    proxies = {
+        "http": "127.0.0.1:8080",
+        "https": "127.0.0.1:8080",
+    }
+    for url in urls:
+        if "*" not in url:
+            result = poc(url.split("\n")[0], proxies).main()

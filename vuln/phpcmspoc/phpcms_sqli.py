@@ -13,7 +13,7 @@ GitHub:
 # -*- coding: utf-8 -*-
 import requests
 import re
-from urllib.parse import urlparse, quote
+from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 

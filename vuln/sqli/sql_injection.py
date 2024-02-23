@@ -19,7 +19,8 @@ import requests
 import re
 import random
 from urllib.parse import urlparse
-from requests.packages.urllib3 import disable_warnings;disable_warnings()
+from requests.packages.urllib3 import disable_warnings
+disable_warnings()
 
 
 class poc:
