@@ -19,15 +19,25 @@ from modules import logo
 import sys
 logo.logo()
 
-from gevent import monkey;monkey.patch_all()
-from gevent.pool import Pool
-from gevent.queue import Queue
-import requests
-import os
-import re
-import time
-import warnings;warnings.filterwarnings("ignore")
-from requests.packages.urllib3 import disable_warnings;disable_warnings()
+try:
+    from gevent import monkey;monkey.patch_all()
+    from gevent.pool import Pool
+    from gevent.queue import Queue
+    import requests
+    import os
+    import re
+    import time
+    import warnings;warnings.filterwarnings("ignore")
+    from requests.packages.urllib3 import disable_warnings;disable_warnings()
+    
+    from argparse import ArgumentParser
+    from modules import duplicate_removal
+    from modules.vulnscan import vulnscan
+    from modules.dirmap import dirmap
+    from modules.writeword import WW
+    from modules.upgrade import up
+except:
+    print(" [-] 还有模块未安装，请在当前目录下运行：pip install -r requirements.txt，安装模块。")
 
 try:
     print(" [*] 正在检测工具是否为最新版，请稍后......")
@@ -35,14 +45,6 @@ try:
     versioncheck().main()
 except:
     pass
-
-from argparse import ArgumentParser
-from modules import duplicate_removal
-from modules.vulnscan import vulnscan
-from modules.dirmap import dirmap
-from modules.writeword import WW
-from modules.upgrade import up
-
 
 def argument():
     parser = ArgumentParser()
