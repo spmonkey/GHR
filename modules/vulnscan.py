@@ -60,6 +60,7 @@ class vulnscan:
     def main(self):
         pool = Pool(50)
         if self.vuln_queue():
-            tasks = [pool.spawn(self.vuln, i) for i in range(50)]
+            for i in range(50):
+                pool.spawn(self.vuln, i)
             pool.join()
         return self.results
