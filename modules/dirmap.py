@@ -21,7 +21,6 @@ from gevent.queue import Queue
 from bs4 import BeautifulSoup
 from requests.packages.urllib3 import disable_warnings
 from urllib.parse import urlparse
-import gevent
 import time
 import requests
 import os

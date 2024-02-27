@@ -19,8 +19,6 @@ from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from urllib.parse import urlparse
 import dirmap
-import re
-
 
 class urldismantle:
     def __init__(self, url):
