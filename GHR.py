@@ -58,8 +58,9 @@ def argument():
         GHR_module.add_argument('-t', '--thread', type=str, default=None, help="线程设置，例：--thread 10 默认线程数为：20，-t 10 默认线程数为：20")
         args = parser.parse_args()
         return args
-    except Exception as e:
-        pass
+    except:
+        print(" [-] 设置参数失败，请重新运行程序！\n")
+        return
 
 
 class GHR:

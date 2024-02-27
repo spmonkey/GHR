@@ -13,7 +13,7 @@ def set_value(key, value):
 def get_value(key):
     try:
         return _global_dict[key]
-    except Exception as e:
+    except:
         return False
 
 
@@ -76,7 +76,7 @@ def get_poc_modole_list():  # 调用此函数获取 /pocs 下的全部 poc
         poc_modole_path = path_to_modolepath(poc_path)  # 传入相对路径返回模块导入路径
         try:
             poc_module_list.append(importlib.import_module(poc_modole_path))
-        except Exception as e:
+        except:
             pass
     return poc_module_list
 
@@ -94,7 +94,7 @@ def get_pocinfo_dict():  # 获取pocinfo字典
             poc_modole = importlib.import_module(poc_modole_path)
             if poc_modole.poc:
                 pocinfo_dict[script_name] = poc_modole
-        except Exception as e:
+        except:
             pass
     return pocinfo_dict
 
