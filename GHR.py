@@ -80,6 +80,7 @@ class GHR:
                 self.thread = args.thread
             else:
                 self.thread = 20
+            self.thread = int(self.thread)
             self.headers = {
                 'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
             }
@@ -154,7 +155,7 @@ class GHR:
         WW(url, result_list=result).main()
 
     def vuln_main(self):
-        pool = Pool(int(self.thread))
+        pool = Pool(self.thread)
         jobs = []
         if self.filename is not None:
             OL = len(self.file)
