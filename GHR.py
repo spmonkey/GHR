@@ -27,9 +27,11 @@ try:
     import os
     import re
     import time
+    import datetime
     import warnings;warnings.filterwarnings("ignore")
+    from urllib.parse import urlparse
     from requests.packages.urllib3 import disable_warnings;disable_warnings()
-    
+
     from argparse import ArgumentParser
     from modules import duplicate_removal
     from modules.vulnscan import vulnscan
@@ -63,7 +65,7 @@ def argument():
 
 
 class GHR:
-    def __init__(self, args):
+    def __init__(self, args, start_time):
         if args.upgrade:
             self.updata()
         try:
@@ -73,9 +75,6 @@ class GHR:
                 if "\\" in self.filename:
                     self.filename = re.sub("\\\\", "\\\\\\\\", self.filename)
                 self.file = open(self.filename, "r", encoding='utf-8').readlines()
-            if self.url is not None:
-                if self.url[-1] != "/" and "?" not in self.url:
-                    self.url = self.url + "/"
             if args.thread:
                 self.thread = args.thread
             else:
@@ -86,6 +85,7 @@ class GHR:
             }
             self.q = Queue()
             self.order = args.nodir
+            self.start_time = start_time
             self.url_list = []
             self.results = []
             self.symbol = ['|', '/', '-', '\\', '|', '/', '-', '\\']
@@ -116,15 +116,21 @@ class GHR:
             self.results.append(result)
 
     def dirb_scan(self, target, count, unfinished):
+        self.url_list.append(target)
+        parsed_url = urlparse(target)
+        path = parsed_url.path
+        if '.' in path.split('/')[-1]:
+            path_without_file = '/'.join(path.split('/')[:-1]) + '/'
+        else:
+            path_without_file = path
+        new_url = f"{parsed_url.scheme}://{parsed_url.netloc}{path_without_file}"
         if self.order:
-            result = dirmap(target, self.proxies, thread=self.thread, order=False).main(count, unfinished)
-            self.url_list.append(target)
+            result = dirmap(new_url, self.proxies, thread=self.thread, order=False).main(count, unfinished)
             for url in result:
                 if url not in self.url_list:
                     self.url_list.append(url)
         else:
-            result = dirmap(url=target, proxies=self.proxies, thread=self.thread).main(count, unfinished)
-            self.url_list.append(target)
+            result = dirmap(url=new_url, proxies=self.proxies, thread=self.thread).main(count, unfinished)
             for url in result:
                 if url not in self.url_list:
                     self.url_list.append(url)
@@ -152,7 +158,7 @@ class GHR:
             return False
 
     def write_main(self, url, result):
-        WW(url, result_list=result).main()
+        WW(url, result_list=result, start_time=self.start_time).main()
 
     def vuln_main(self):
         pool = Pool(self.thread)
@@ -227,10 +233,9 @@ class GHR:
                             print(f''' [{self.symbol[symbolnum]}] 正在扫描{"." * (dot + 1)}''')
                             sys.stdout.write("\033[F" * 1)
                             time.sleep(1)
-                    for job in jobs:
-                        if job.ready():
-                            self.flag = True
-                            break
+                    if all([job.ready() for job in jobs]):
+                        self.flag = True
+                        break
             sys.stdout.write("\r" + " " * 15)
             sys.stdout.flush()
             # 去重
@@ -260,6 +265,6 @@ class GHR:
 
 
 if __name__ == '__main__':
+    start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     args = argument()
-    GHR(args=args)
-
+    GHR(args=args, start_time=start_time)
