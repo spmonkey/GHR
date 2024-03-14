@@ -24,19 +24,31 @@ from docx.oxml.ns import qn
 
 
 class WW:
-    def __init__(self, url, result_list):
+    def __init__(self, url, result_list, start_time):
         self.file_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.url = url
         filename = urlparse(self.url)
         netloc = "_".join(filename.netloc.split("."))
         scheme = filename.scheme
         path = filename.path
+        filetime = start_time
+        if "-" in filetime:
+            filetime = filetime.replace("-", "_")
+        if " " in filetime:
+            filetime = filetime.replace(" ", "_")
+        if ":" in filetime:
+            filetime = filetime.replace(":", "_")
         if ":" in netloc:
             netloc = netloc.replace(":", "_")
         if "/" in path:
             path = path.replace("/", "_")
+        if path[-1:] == "_":
+            path = path + filetime
+        else:
+            path = path + "_" + filetime
         self.file_name = "{}_{}{}".format(scheme, netloc, path)
         self.result = result_list
+        self.starttime = start_time
         self.result_list = []
         self.vuln_path = []
         self.vuln_request = []
@@ -49,7 +61,7 @@ class WW:
             if "OPTIONS" in result:
                 result = result.replace("开启了 OPTIONS 方法", "检测到目标站点存在开启了 OPTIONS 方法漏洞")
             vuln_name = re.findall("存在(.*)漏洞(.*)\x1b", result)
-            if "CVE" in vuln_name[0][1]:
+            if "CVE" in vuln_name[0][1] or "Web服务器" in vuln_name[0][1]:
                 vulnname = vuln_name[0][0] + ":" + vuln_name[0][1]
             else:
                 vulnname = vuln_name[0][0]
@@ -83,7 +95,7 @@ class WW:
         else:
             repair_suggestions = open("{}/library/repair_suggestion.txt".format(self.file_path), "r", encoding="utf-8").readlines()
         for repair_suggestion in repair_suggestions:
-            if "JavaScript框架库漏洞" in repair_suggestion:
+            if "JavaScript框架库漏洞" in repair_suggestion or "CORS跨域资源共享漏洞" in repair_suggestion:
                 all = repair_suggestion.strip().split("：")
             else:
                 all = repair_suggestion.strip().split(":")
@@ -105,7 +117,7 @@ class WW:
         url_run.font.name = u'宋体'
         for vulnname in self.result_dicts.keys():
             vuln_name_add = doc.add_heading("", level=2)
-            if "CVE" in vulnname:
+            if "CVE" in vulnname or "Web服务器" in vulnname:
                 vuln = vulnname.split(":")[0]
                 cve = vulnname.split(":")[1]
             else:
@@ -114,12 +126,19 @@ class WW:
                 vuln_name_run = vuln_name_add.add_run(vuln + "（低危）")
             else:
                 if ":" in vulnname:
-                    vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + cve + "（高危）")
+                    if "Web服务器" in cve:
+                        vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + cve + "（中危）")
+                    else:
+                        vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + cve + "（高危）")
                 else:
                     if "JavaScript" in vulnname or "Host头" in vulnname:
                         vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + "（中危）")
                     else:
                         vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + "（高危）")
+            scantime = doc.add_paragraph("扫描时间：")
+            scantime_format = scantime.paragraph_format
+            scantime_format.space_after = 0
+            starttime = doc.add_paragraph(self.starttime)
             vuln_name_run.font.name = u'宋体'
             vuln_name_run._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
             describe = doc.add_heading("", level=3)

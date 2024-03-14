@@ -61,6 +61,3 @@ class urldismantle:
         pool.join()
 
 
-# if __name__ == '__main__':
-#     url = "http://127.0.0.1:8080"
-#     urldismantle(url).main()
