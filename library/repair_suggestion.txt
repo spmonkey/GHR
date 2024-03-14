@@ -19,4 +19,7 @@ SQL注入漏洞:代码层最佳防御sql漏洞方案：使用预编译sql语句�
 反序列化漏洞:1、类的白名单校验机制：实际上原理很简单，就是对所有传入的反序列化对象，在反序列化过程开始前，对类型名称做一个检查，不符合白名单的类不进行反序列化操作。很显然，这个白名单肯定是不存在Runtime的。\n2、禁止JVM执行外部命令Runtime.exec，这个措施可以通过扩展 SecurityManager 可以实现。
 跨站脚本注入攻击漏洞:xss漏洞本质上是一种html注入，也就是将html代码注入到网页中。那么其防御的根本就是在将用户提交的代码显示到页面上时做好一系列的过滤与转义\n（1）过滤输入的数据，对例如：" ' "、" " "、" < "、" > "、" on* "、script、iframe等危险字符进行严格的检查。这里的输入不仅仅是用户可以直接交互的输入接口，也包括HTTP请求中的Cookie中的变量，HTTP请求头部中的变量等。\n（2）不仅验证数据的类型，还要验证其格式、长度、范围和内容。\n（3）不仅在客户端做数据的验证与过滤，关键的过滤步骤在服务端进行。\n（4）对输出到页面的数据进行相应的编码转换，如HTML实体编码、JS编码等。对输出的数据也要检查，数据库里的值有可能会在一个大网站的多处都有输出，即使在输入做了编码等操作，在各处的输出点时也要进行检查。
 跨站式追踪攻击漏洞:Web 服务器限制 Trace、Track 方法的请求。
-CORS跨域资源共享漏洞:1、Access-Control-Allow-Origin中指定的来源只能是受信任的站点，避免使用Access-Control-Allow-Origin: *，避免使用Access-Control-Allow-Origin: null，否则攻击者可以伪造来源请求实现跨域资源窃取。\n2、严格校验“Origin”值，校验的正则表达式一定要编写完善，避免出现绕过的情况。\n3、减少“Access-Control-Allow-Methods”所允许的请求方法。\n4、除了正确配置CORS之外，Web服务器还应继续对敏感数据进行保护，例如身份验证和会话管理等。
+CORS跨域资源共享漏洞：1、Access-Control-Allow-Origin中指定的来源只能是受信任的站点，避免使用Access-Control-Allow-Origin: *，避免使用Access-Control-Allow-Origin: null，否则攻击者可以伪造来源请求实现跨域资源窃取。\n2、严格校验“Origin”值，校验的正则表达式一定要编写完善，避免出现绕过的情况。\n3、减少“Access-Control-Allow-Methods”所允许的请求方法。\n4、除了正确配置CORS之外，Web服务器还应继续对敏感数据进行保护，例如身份验证和会话管理等。
+URL重定向漏洞:1、严格控制将要跳转的域名，如果某个业务事先已经确定将要跳转的网站，最稳妥的方式是将其直接编码在源代码中，通过URL中传入的参数来映射跳转网址。\n2、严格验证跳转URL参数的有效性、合法性。\n3、校验传入的URL参数是否为可信域名。
+Tomcat示例目录漏洞:1、禁止访问或者直接删除examples样例目录下的资源。\n2、做目录访问权限设置，防止目录遍历。
+Apache Multiviews攻击漏洞:在Apache的httpd.conf文件中，将+MultiViews移除。\n<Directory  "/www/demo">\n        Options +FollowSymLinks +MultiViews\n        AllowOverride All\n        Require all granted\n</Directory>
