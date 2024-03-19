@@ -20,7 +20,9 @@ from gevent.pool import Pool
 from gevent.queue import Queue
 import os
 import sys
+import re
 import platform
+import datetime
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(path)
 from modules import common
@@ -49,6 +51,8 @@ class vulnscan:
             if self.q.qsize() == 0:
                 return
             model = self.q.get()
+            model_text = re.search("module (.*) from", str(model)).group(1)
+            print("\033[34m [*] \033[0m{} script {}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), model_text.replace("'", "")))
             if "poc" in str(model):
                 if self.url == self.target:
                     result = model.poc(self.url, self.proxies).main()

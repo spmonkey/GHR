@@ -15,6 +15,7 @@ GitHub:
     https://github.com/spmonkey/
 '''
 # -*- coding: utf-8 -*-
+
 from modules import logo
 import sys
 logo.logo()
@@ -23,6 +24,7 @@ try:
     from gevent import monkey;monkey.patch_all()
     from gevent.pool import Pool
     from gevent.queue import Queue
+    import gevent
     import requests
     import os
     import re
@@ -38,6 +40,7 @@ try:
     from modules.dirmap import dirmap
     from modules.writeword import WW
     from modules.upgrade import up
+    from modules import get_user_agent
 except:
     print(" [-] 还有模块未安装，请在当前目录下运行：pip install -r requirements.txt，安装模块。")
 
@@ -47,6 +50,7 @@ try:
     versioncheck().main()
 except:
     pass
+
 
 def argument():
     parser = ArgumentParser()
@@ -81,15 +85,13 @@ class GHR:
                 self.thread = 20
             self.thread = int(self.thread)
             self.headers = {
-                'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+                'User-Agent': get_user_agent.get_user_agent(),
             }
             self.q = Queue()
             self.order = args.nodir
             self.start_time = start_time
             self.url_list = []
             self.results = []
-            self.symbol = ['|', '/', '-', '\\', '|', '/', '-', '\\']
-            self.flag = False
             self.high_cont = 0
             self.middle_cont = 0
             self.low_cont = 0
@@ -146,7 +148,7 @@ class GHR:
 
     def test_before_use(self, url):
         try:
-            result = requests.get(url=url, headers=self.headers, timeout=3, verify=False)
+            result = requests.get(url=url, headers=self.headers, proxies=self.proxies, timeout=10, verify=False)
             if result.status_code <= 500:
                 print("\033[32m{} --> {}\033[0m".format(url, result.status_code))
                 return True
@@ -177,22 +179,7 @@ class GHR:
                     for i in range(int(self.thread)):
                         tasks = pool.spawn(self.web_vuln, url)
                         jobs.append(tasks)
-                    while not self.flag:
-                        for dot in range(0, 8):
-                            symbolnum = dot
-                            if dot == 7:
-                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{" " * 10}
- [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
-                                sys.stdout.write("\033[F" * 2)
-                                time.sleep(1)
-                            else:
-                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{'.' * (dot + 1)}
- [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
-                                sys.stdout.write("\033[F" * 2)
-                                time.sleep(1)
-                        if all([job.ready() for job in jobs]):
-                            self.flag = True
-                            break
+                    gevent.joinall(jobs)
                 # 去重
                 result = duplicate_removal.duplicate_removal(self.results).dr()
                 result_text = result[0]
@@ -213,7 +200,6 @@ class GHR:
                 self.high_cont = 0
                 self.middle_cont = 0
                 self.low_cont = 0
-                self.flag = False
         elif self.url is not None:
             if self.test_before_use(self.url):
                 sys.stdout.write("\n")
@@ -222,20 +208,7 @@ class GHR:
                 for i in range(int(self.thread)):
                     tasks = pool.spawn(self.web_vuln, self.url)
                     jobs.append(tasks)
-                while not self.flag:
-                    for dot in range(0, 8):
-                        symbolnum = dot
-                        if dot == 7:
-                            print(f''' [{self.symbol[symbolnum]}] 正在扫描{" " * 10}''')
-                            sys.stdout.write("\033[F" * 1)
-                            time.sleep(1)
-                        else:
-                            print(f''' [{self.symbol[symbolnum]}] 正在扫描{"." * (dot + 1)}''')
-                            sys.stdout.write("\033[F" * 1)
-                            time.sleep(1)
-                    if all([job.ready() for job in jobs]):
-                        self.flag = True
-                        break
+                gevent.joinall(jobs)
             sys.stdout.write("\r" + " " * 15)
             sys.stdout.flush()
             # 去重

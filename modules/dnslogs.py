@@ -17,8 +17,13 @@ GitHub:
 # -*- coding: utf-8 -*-
 import requests
 import re
+import os
+import sys
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(path)
+from modules import get_user_agent
 
 
 class dnslogs:
@@ -28,19 +33,25 @@ class dnslogs:
     def get_dnslog(self):
         url = "http://dnslog.cn/getdomain.php"
         headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'User-Agent': get_user_agent.get_user_agent(),
             'Connection': 'close'
         }
-        result = requests.get(url=url, proxies=self.proxies, headers=headers, verify=False)
-        cookie = re.search("(.*);", result.headers.get('Set-Cookie')).group(1)
-        return result.text, cookie
+        try:
+            result = requests.get(url=url, proxies=self.proxies, headers=headers, verify=False)
+            cookie = re.search("(.*);", result.headers.get('Set-Cookie')).group(1)
+            return result.text, cookie
+        except:
+            return False
 
     def get_result(self, cookie):
         url = "http://dnslog.cn/getrecords.php"
         headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'User-Agent': get_user_agent.get_user_agent(),
             'Cookie': cookie,
             'Connection': 'close'
         }
-        result = requests.get(url=url, proxies=self.proxies, headers=headers, verify=False)
-        return result.text
+        try:
+            result = requests.get(url=url, proxies=self.proxies, headers=headers, verify=False)
+            return result.text
+        except:
+            return False

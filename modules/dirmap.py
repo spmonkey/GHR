@@ -28,6 +28,8 @@ import os
 import sys
 disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(path)
+from modules import get_user_agent
 
 
 class dirmap:
@@ -35,9 +37,6 @@ class dirmap:
         self.url = url
         if self.url[-1] != "/" and order:
             self.url += "/"
-        self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)'
-        }
         self.q = Queue()
         self.order = order
         self.thread = thread
@@ -63,14 +62,20 @@ class dirmap:
             path = self.q.get_nowait()
             url = self.url + path
             try:
-                result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies, allow_redirects=False)
+                headers = {
+                    'User-Agent': get_user_agent.get_user_agent(),
+                }
+                result = requests.get(url=url, headers=headers, verify=False, proxies=self.proxies, allow_redirects=False)
                 if result.status_code == 200 and url not in self.path_list:
                     self.path_list.append(url)
             except:
                 pass
 
     def crawler(self):
-        result = requests.get(url=self.url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+        headers = {
+            'User-Agent': get_user_agent.get_user_agent(),
+        }
+        result = requests.get(url=self.url, headers=headers, verify=False, timeout=3, proxies=self.proxies)
         result.encoding = "utf-8"
         soup = BeautifulSoup(result.text, "lxml")
         scripts = soup.find_all("script")
@@ -131,23 +136,23 @@ class dirmap:
                         for dot in range(0, 8):
                             symbolnum = dot
                             if dot == 7:
-                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{" " * 10}''')
+                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{" " * 10}''')
                                 sys.stdout.write("\033[F" * 1)
                                 time.sleep(1)
                             else:
-                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{"." * (dot + 1)}''')
+                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{"." * (dot + 1)}''')
                                 sys.stdout.write("\033[F" * 1)
                                 time.sleep(1)
                     else:
                         for dot in range(0, 8):
                             symbolnum = dot
                             if dot == 7:
-                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{" " * 10}
+                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{" " * 10}
  [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
                                 sys.stdout.write("\033[F" * 2)
                                 time.sleep(1)
                             else:
-                                print(f''' [{self.symbol[symbolnum]}] 正在扫描{"." * (dot + 1)}
+                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{"." * (dot + 1)}
  [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
                                 sys.stdout.write("\033[F" * 2)
                                 time.sleep(1)
