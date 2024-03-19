@@ -19,16 +19,21 @@ Fofa:
 # -*- coding: utf-8 -*-
 import requests
 import re
+import os
+import sys
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(path)
+from modules import get_user_agent
 
 
 class poc:
     def __init__(self, url, proxies):
         self.url = url
         self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'User-Agent': get_user_agent.get_user_agent(),
         }
         self.value_list = []
         self.result_text = ""

