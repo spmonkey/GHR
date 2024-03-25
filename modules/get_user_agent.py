@@ -16,10 +16,15 @@ GitHub:
 '''
 # -*- coding: utf-8 -*-
 import random
+import sys
 import os
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def get_user_agent():
-    user_agent_list = open("{}\\library\\user-agents.txt".format(path), "r", encoding="utf-8").readlines()
-    return random.choice(user_agent_list).split("\n")[0]
+    if sys.platform.startswith("win"):
+        user_agent_list = open("{}\\library\\user-agents.txt".format(path), "r", encoding="utf-8").readlines()
+        return random.choice(user_agent_list).split("\n")[0]
+    else:
+        user_agent_list = open("{}/library/user-agents.txt".format(path), "r", encoding="utf-8").readlines()
+        return random.choice(user_agent_list).split("\n")[0]
