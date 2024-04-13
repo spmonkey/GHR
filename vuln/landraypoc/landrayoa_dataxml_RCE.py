@@ -65,3 +65,13 @@ class poc:
             return self.result_text
         else:
             return False
+
+
+if __name__ == '__main__':
+    url = "https://ekp.gzepi.com.cn:8443/admin.do"
+    proxy = {
+        "http": "127.0.0.1:8080",
+        "https": "127.0.0.1:8080",
+    }
+    result = poc(url=url, proxies=proxy).main()
+    print(result)

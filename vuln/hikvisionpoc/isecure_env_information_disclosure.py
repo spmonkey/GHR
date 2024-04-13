@@ -40,7 +40,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/artemis-portal/artemis/env".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200 and result.json() != '':
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m

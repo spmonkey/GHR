@@ -57,7 +57,7 @@ class poc:
                 logpath = temppath + filename
                 vulurl = "{}{}".format(self.url.rstrip('/'), logpath)
                 try:
-                    resp = requests.get(url=vulurl, headers=headers, proxies=self.proxies, timeout=3, verify=False)
+                    resp = requests.get(url=vulurl, headers=headers, proxies=self.proxies, verify=False)
                     if "INFO" in resp.text and resp.status_code == 200:
                         # print(vulurl)
                         return True
@@ -71,7 +71,7 @@ class poc:
                 vulurl = "{}{}".format(
                     self.url.rstrip('/'), logpath)
                 try:
-                    resp = requests.get(url=vulurl, headers=headers, proxies=self.proxies, timeout=3, verify=False)
+                    resp = requests.get(url=vulurl, headers=headers, proxies=self.proxies, verify=False)
                     if "INFO" in resp.text and resp.status_code == 200:
                         # print(vulurl)
                         return True

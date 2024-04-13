@@ -48,7 +48,7 @@ class poc:
                 return True
         except:
             try:
-                result = requests.get(url=self.url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=self.url, headers=self.headers, verify=False, proxies=self.proxies)
                 jQuery_version = re.search("v(\d+\.\d+\.\d+)", result.text).group(1)
                 if jQuery_version <= "3.5.0":
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在JavaScript框架库漏洞\033[0m

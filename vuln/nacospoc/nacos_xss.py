@@ -51,7 +51,7 @@ class poc:
             result_text = ""
             url = "{}://{}{}".format(scheme, netloc, payload)
             try:
-                result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+                result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
                 if self.payload in result.text:
                     target = urlparse(url)
                     result_text += """\n        [+]    \033[32m检测到目标站点存在跨站脚本注入攻击漏洞\033[0m

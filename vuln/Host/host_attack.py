@@ -35,7 +35,7 @@ class poc:
     def vuln(self):
         target = urlparse(self.url)
         try:
-            result = requests.get(url=self.url, headers=self.headers, verify=False, timeout=3, allow_redirects=False, proxies=self.proxies)
+            result = requests.get(url=self.url, headers=self.headers, verify=False, allow_redirects=False, proxies=self.proxies)
             if result.status_code < 400:
                 self.result_text += "\n        [+]    \033[32m检测到目标站点存在Host头攻击漏洞\033[0m"
                 if target.query != "":

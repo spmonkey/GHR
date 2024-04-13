@@ -38,7 +38,7 @@ class poc:
     def vuln(self):
         target = urlparse(self.url)
         try:
-            result = requests.options(url=self.url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.options(url=self.url, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200 and "Allow" in result.headers:
                 self.result_text += """\n        [+]    \033[32m开启了 OPTIONS 方法\033[0m
                  OPTIONS {} HTTP/1.1
