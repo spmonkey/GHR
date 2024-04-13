@@ -17,12 +17,10 @@ GitHub:
 # -*- coding: utf-8 -*-
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
-from gevent.queue import Queue
 from bs4 import BeautifulSoup
 from requests.packages.urllib3 import disable_warnings
 from urllib.parse import urlparse
-import gevent
-import time
+import datetime
 import requests
 import os
 import sys
@@ -37,7 +35,6 @@ class dirmap:
         self.url = url
         if self.url[-1] != "/" and order:
             self.url += "/"
-        self.q = Queue()
         self.order = order
         self.thread = thread
         self.symbol = ['|', '/', '-', '\\', '|', '/', '-', '\\']
@@ -49,33 +46,27 @@ class dirmap:
         else:
             self.dictionarys = open(path + "/library/dicc.txt").readlines()
         self.proxies = proxies
+        self.stop = 0
 
-    def dictionarys_queue(self):
-        for dictionary in self.dictionarys:
-            self.q.put(dictionary.split("\n")[0])
-        return True
-
-    def dirmap(self, x):
-        while True:
-            if self.q.qsize() == 0:
-                return True
-            path = self.q.get_nowait()
-            url = self.url + path
-            try:
-                headers = {
-                    'User-Agent': get_user_agent.get_user_agent(),
-                }
-                result = requests.get(url=url, headers=headers, verify=False, proxies=self.proxies, allow_redirects=False)
-                if result.status_code == 200 and url not in self.path_list:
-                    self.path_list.append(url)
-            except:
-                pass
+    def dirmap(self, path):
+        url = self.url + path
+        self.stop += 1
+        print("\r\033[34m [*] \033[0m[{}] 当前目录探测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.stop), end="")
+        try:
+            headers = {
+                'User-Agent': get_user_agent.get_user_agent(),
+            }
+            result = requests.get(url=url, headers=headers, verify=False, proxies=self.proxies, allow_redirects=False)
+            if result.status_code == 200 and url not in self.path_list:
+                self.path_list.append(url)
+        except:
+            pass
 
     def crawler(self):
         headers = {
             'User-Agent': get_user_agent.get_user_agent(),
         }
-        result = requests.get(url=self.url, headers=headers, verify=False, timeout=3, proxies=self.proxies)
+        result = requests.get(url=self.url, headers=headers, verify=False, proxies=self.proxies)
         result.encoding = "utf-8"
         soup = BeautifulSoup(result.text, "lxml")
         scripts = soup.find_all("script")
@@ -123,46 +114,15 @@ class dirmap:
             if path not in paths:
                 self.over_path.append(path)
 
-    def main(self, count, unfinished):
+    def main(self):
+        print("\033[34m [*] \033[0m[{}] 正在进行目录探测，请稍后...".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         if self.order:
             pool = Pool(self.thread)
-            jobs = []
-            if self.dictionarys_queue():
-                for i in range(self.thread):
-                    task = pool.spawn(self.dirmap, i)
-                    jobs.append(task)
-                while not self.flag:
-                    if count == 0 and unfinished == 0:
-                        for dot in range(0, 8):
-                            symbolnum = dot
-                            if dot == 7:
-                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{" " * 10}''')
-                                sys.stdout.write("\033[F" * 1)
-                                time.sleep(1)
-                            else:
-                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{"." * (dot + 1)}''')
-                                sys.stdout.write("\033[F" * 1)
-                                time.sleep(1)
-                    else:
-                        for dot in range(0, 8):
-                            symbolnum = dot
-                            if dot == 7:
-                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{" " * 10}
- [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
-                                sys.stdout.write("\033[F" * 2)
-                                time.sleep(1)
-                            else:
-                                print(f''' [{self.symbol[symbolnum]}] 正在进行目录扫描{"." * (dot + 1)}
- [+] 已完成url数量：{count}，未完成url数量：{unfinished}''')
-                                sys.stdout.write("\033[F" * 2)
-                                time.sleep(1)
-                    for job in jobs:
-                        if job.ready():
-                            self.flag = True
-                            break
+            pool.map(self.dirmap, self.dictionarys)
         print("\r", end="")
         self.crawler()
         self.filtration()
+        print("\033[32m [+] \033[0m[{}] 目录探测已完成".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + " " * 100 + "\n")
         return self.over_path
 
 

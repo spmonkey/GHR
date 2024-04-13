@@ -39,6 +39,7 @@ class vulnscan:
         self.pocinfo_dict = common.get_value("pocinfo_dict")
         self.results = []
         self.proxies = proxy
+        self.count = 0
 
     def vuln_queue(self):
         for i in self.pocinfo_dict:
@@ -51,9 +52,10 @@ class vulnscan:
             if self.q.qsize() == 0:
                 return
             model = self.q.get()
-            model_text = re.search("module (.*) from", str(model)).group(1)
-            print("\033[34m [*] \033[0m{} script {}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), model_text.replace("'", "")))
-            if "poc" in str(model):
+            # model_text = re.search("module (.*) from", str(model)).group(1)
+            self.count += 1
+            print("\r\033[34m [*] \033[0m[{}] 当前漏洞检测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.count), end="")
+            if "poc" in str(model) or "redirection" in str(model):
                 if self.url == self.target:
                     result = model.poc(self.url, self.proxies).main()
                     self.results.append(result)
@@ -66,4 +68,7 @@ class vulnscan:
         if self.vuln_queue():
             tasks = [pool.spawn(self.vuln, i) for i in range(50)]
             pool.join()
+        print("\r", end="")
+        print("\033[32m [+] \033[0m[{}] 漏洞检测已完成".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + " " * 100 + "\n")
+
         return self.results

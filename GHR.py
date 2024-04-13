@@ -29,7 +29,9 @@ try:
     import os
     import re
     import time
+    import itertools
     import datetime
+    import random
     import warnings;warnings.filterwarnings("ignore")
     from urllib.parse import urlparse
     from requests.packages.urllib3 import disable_warnings;disable_warnings()
@@ -40,9 +42,10 @@ try:
     from modules.dirmap import dirmap
     from modules.writeword import WW
     from modules.upgrade import up
-    from modules import get_user_agent
-except:
+except Exception as e:
+    print(e)
     print(" [-] 还有模块未安装，请在当前目录下运行：pip install -r requirements.txt，安装模块。")
+    sys.exit()
 
 try:
     print(" [*] 正在检测工具是否为最新版，请稍后......")
@@ -68,6 +71,30 @@ def argument():
         pass
 
 
+def get_user_agent():
+    user_agent_list = [
+        {'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)'},
+        {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; en) Opera 11.00'},
+        {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.9.0.2) Gecko/2008092313 Ubuntu/8.04 (hardy) Firefox/3.0.2'},
+        {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-GB; rv:1.9.1.15) Gecko/20101027 Fedora/3.5.15-1.fc12 Firefox/3.5.15'},
+        {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US) AppleWebKit/534.10 (KHTML, like Gecko) Chrome/8.0.551.0 Safari/534.10'},
+        {'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.2) Gecko/2008092809 Gentoo Firefox/3.0.2'},
+        {'User-Agent': 'Mozilla/5.0 (X11; U; Linux x86_64; en-US) AppleWebKit/534.10 (KHTML, like Gecko) Chrome/7.0.544.0'},
+        {'User-Agent': 'Opera/9.10 (Windows NT 5.2; U; en)'},
+        {'User-Agent': 'Mozilla/5.0 (iPhone; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko)'},
+        {'User-Agent': 'Opera/9.80 (X11; U; Linux i686; en-US; rv:1.9.2.3) Presto/2.2.15 Version/10.10'},
+        {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; ru-RU) AppleWebKit/533.18.1 (KHTML, like Gecko) Version/5.0.2 Safari/533.18.5'},
+        {'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9b3) Gecko/2008020514 Firefox/3.0b3'},
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_4_11; fr) AppleWebKit/533.16 (KHTML, like Gecko) Version/5.0 Safari/533.16'},
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_6; en-US) AppleWebKit/534.20 (KHTML, like Gecko) Chrome/11.0.672.2 Safari/534.20'},
+        {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; InfoPath.2)'},
+        {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 6.0; X11; Linux x86_64; en) Opera 9.60'},
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_2; en-US) AppleWebKit/533.4 (KHTML, like Gecko) Chrome/5.0.366.0 Safari/533.4'},
+        {'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; U; en; rv:1.8.1) Gecko/20061208 Firefox/2.0.0 Opera 9.51'}
+    ]
+    return random.choice(user_agent_list)
+
+
 class GHR:
     def __init__(self, args, start_time):
         if args.upgrade:
@@ -84,9 +111,7 @@ class GHR:
             else:
                 self.thread = 20
             self.thread = int(self.thread)
-            self.headers = {
-                'User-Agent': get_user_agent.get_user_agent(),
-            }
+            self.headers = get_user_agent()
             self.q = Queue()
             self.order = args.nodir
             self.start_time = start_time
@@ -99,7 +124,8 @@ class GHR:
                 "http": args.proxy,
                 "https": args.proxy
             }
-        except:
+        except Exception as e:
+            print(e)
             print(" [-] 缺少参数！请使用 -h 或阅读 readme 查看详细的使用方法！\n")
             return
         self.vuln_main()
@@ -109,15 +135,12 @@ class GHR:
             self.q.put(url)
         return True
 
-    def web_vuln(self, target):
-        while True:
-            if self.q.qsize() == 0:
-                return
-            url = self.q.get_nowait()
-            result = vulnscan(url=url, target=target, proxy=self.proxies).main()
-            self.results.append(result)
+    def web_vuln(self, all):
+        url, target = all
+        result = vulnscan(url=url, target=target, proxy=self.proxies).main()
+        self.results.append(result)
 
-    def dirb_scan(self, target, count, unfinished):
+    def dirb_scan(self, target):
         self.url_list.append(target)
         parsed_url = urlparse(target)
         path = parsed_url.path
@@ -127,12 +150,12 @@ class GHR:
             path_without_file = path
         new_url = f"{parsed_url.scheme}://{parsed_url.netloc}{path_without_file}"
         if self.order:
-            result = dirmap(new_url, self.proxies, thread=self.thread, order=False).main(count, unfinished)
+            result = dirmap(new_url, self.proxies, thread=self.thread, order=False).main()
             for url in result:
                 if url not in self.url_list:
                     self.url_list.append(url)
         else:
-            result = dirmap(url=new_url, proxies=self.proxies, thread=self.thread).main(count, unfinished)
+            result = dirmap(url=new_url, proxies=self.proxies, thread=self.thread).main()
             for url in result:
                 if url not in self.url_list:
                     self.url_list.append(url)
@@ -148,14 +171,14 @@ class GHR:
 
     def test_before_use(self, url):
         try:
-            result = requests.get(url=url, headers=self.headers, proxies=self.proxies, timeout=10, verify=False)
+            result = requests.get(url=url, headers=self.headers, proxies=self.proxies, verify=False)
             if result.status_code <= 500:
                 print("\033[32m{} --> {}\033[0m".format(url, result.status_code))
                 return True
             else:
                 print("\033[31m{} --> {}\033[0m".format(url, result.status_code))
                 return False
-        except:
+        except Exception as e:
             print("\033[31m{} time out!\033[0m".format(url))
             return False
 
@@ -166,15 +189,12 @@ class GHR:
         pool = Pool(self.thread)
         jobs = []
         if self.filename is not None:
-            OL = len(self.file)
-            count = 0
             for filename in self.file:
                 url = filename.split("\n")[0]
-                unfinished = OL - count
                 if self.test_before_use(url):
                     sys.stdout.write("\n")
                     sys.stdout.flush()
-                    self.dirb_scan(url, count, unfinished)
+                    self.dirb_scan(url)
                 if self.url_queue():
                     for i in range(int(self.thread)):
                         tasks = pool.spawn(self.web_vuln, url)
@@ -194,7 +214,6 @@ class GHR:
                 if self.low_cont != 0 or self.middle_cont != 0 or self.high_cont != 0:
                     self.write_main(url, result_text)
                 print(" " * 100)
-                count += 1
                 self.url_list = []
                 self.results = []
                 self.high_cont = 0
@@ -203,13 +222,10 @@ class GHR:
         elif self.url is not None:
             if self.test_before_use(self.url):
                 sys.stdout.write("\n")
-                self.dirb_scan(self.url, count=0, unfinished=0)
-            if self.url_queue():
-                for i in range(int(self.thread)):
-                    tasks = pool.spawn(self.web_vuln, self.url)
-                    jobs.append(tasks)
-                gevent.joinall(jobs)
-            sys.stdout.write("\r" + " " * 15)
+                self.dirb_scan(self.url)
+                print("\033[34m [*] \033[0m[{}] 正在进行漏洞检测，请稍后...".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                pool.map(self.web_vuln, list(itertools.product(self.url_list, [self.url])))
+            sys.stdout.write("\r" + " " * 100)
             sys.stdout.flush()
             # 去重
             result = duplicate_removal.duplicate_removal(self.results).dr()
