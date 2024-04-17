@@ -225,6 +225,7 @@ class GHR:
                 self.dirb_scan(self.url)
                 print("\033[34m [*] \033[0m[{}] 正在进行漏洞检测，请稍后...".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                 pool.map(self.web_vuln, list(itertools.product(self.url_list, [self.url])))
+                print("\033[32m [+] \033[0m[{}] 漏洞检测已完成".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + " " * 100 + "\n")
             sys.stdout.write("\r" + " " * 100)
             sys.stdout.flush()
             # 去重
