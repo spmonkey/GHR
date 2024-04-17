@@ -49,7 +49,7 @@ class dirmap:
         self.stop = 0
 
     def dirmap(self, path):
-        url = self.url + path
+        url = self.url + path.split("\n")[0]
         self.stop += 1
         print("\r\033[34m [*] \033[0m[{}] 当前目录探测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.stop), end="")
         try:
