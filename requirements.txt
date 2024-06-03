@@ -3,4 +3,4 @@ gevent
 python_docx==0.8.11
 Requests
 wget
-datetime
+wafw00f

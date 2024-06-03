@@ -42,6 +42,7 @@ try:
     from modules.dirmap import dirmap
     from modules.writeword import WW
     from modules.upgrade import up
+    from modules import wafscaner
 except Exception as e:
     print(e)
     print(" [-] 还有模块未安装，请在当前目录下运行：pip install -r requirements.txt，安装模块。")
@@ -64,6 +65,7 @@ def argument():
         GHR_module.add_argument('--nodir', action='store_true', help="禁用目录扫描")
         GHR_module.add_argument('--proxy', type=str, default=None, help="代理设置，例：--proxy 127.0.0.1:10809")
         GHR_module.add_argument('--upgrade', action='store_true', help="更新参数")
+        GHR_module.add_argument('--list', action='store_true', help="更新参数")
         GHR_module.add_argument('-t', '--thread', type=str, default=None, help="线程设置，例：--thread 10 默认线程数为：20，-t 10 默认线程数为：20")
         args = parser.parse_args()
         return args
@@ -120,6 +122,7 @@ class GHR:
             self.high_cont = 0
             self.middle_cont = 0
             self.low_cont = 0
+            self.cont = 0
             self.proxies = {
                 "http": args.proxy,
                 "https": args.proxy
@@ -130,6 +133,17 @@ class GHR:
             return
         self.vuln_main()
 
+    def wafscanner(self):
+        print("\n [*] 正在进行网站waf检测，请稍等...")
+        result = wafscaner.main(args=self.url, proxy=self.proxies)
+        if result:
+            choice = input(" [+] 站点似乎支持WAF或某种安全解决方案，是否继续？[Y/N] ").upper()
+            print("")
+            if choice == "N":
+                sys.exit()
+        else:
+            print(" [+] 未检测到WAF\n")
+
     def url_queue(self):
         for url in self.url_list:
             self.q.put(url)
@@ -137,7 +151,8 @@ class GHR:
 
     def web_vuln(self, all):
         url, target = all
-        result = vulnscan(url=url, target=target, proxy=self.proxies).main()
+        self.cont += 1
+        result = vulnscan(url=url, target=target, proxy=self.proxies, url_num=self.cont).main()
         self.results.append(result)
 
     def dirb_scan(self, target):
@@ -221,8 +236,10 @@ class GHR:
                 self.low_cont = 0
         elif self.url is not None:
             if self.test_before_use(self.url):
+                self.wafscanner()
                 sys.stdout.write("\n")
                 self.dirb_scan(self.url)
+                print("\033[32m [+] \033[0m[{}] 共找到 {} 条路径\n".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), len(self.url_list)) + " " * 100 + "\n")
                 print("\033[34m [*] \033[0m[{}] 正在进行漏洞检测，请稍后...".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                 pool.map(self.web_vuln, list(itertools.product(self.url_list, [self.url])))
                 print("\033[32m [+] \033[0m[{}] 漏洞检测已完成".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + " " * 100 + "\n")
