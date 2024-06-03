@@ -16,7 +16,7 @@ GitHub:
 '''
 # -*- coding: utf-8 -*-
 import requests
-import os, sys
+import os, sys, re
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
 path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,9 +39,10 @@ class versioncheck:
         return tuple(map(int, version_str.split('.')))
 
     def check(self):
-        url = "https://mirror.ghproxy.com/https://github.com/spmonkey/GHR/blob/main/library/version.txt"
+        url = "https://github.hscsec.cn/spmonkey/GHR/blob/main/library/version.txt"
         new_version = requests.get(url=url, headers=self.headers, verify=False).text
-        return new_version
+        version = re.findall('"blob":\{"rawLines":\["(\d.\d.\d)"]', new_version)
+        return version[0]
 
     def main(self):
         version = self.check()

@@ -37,7 +37,6 @@ class dirmap:
             self.url += "/"
         self.order = order
         self.thread = thread
-        self.symbol = ['|', '/', '-', '\\', '|', '/', '-', '\\']
         self.path_list = []
         self.over_path = []
         self.flag = False
@@ -51,7 +50,9 @@ class dirmap:
     def dirmap(self, path):
         url = self.url + path.split("\n")[0]
         self.stop += 1
-        print("\r\033[34m [*] \033[0m[{}] 当前目录探测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.stop), end="")
+        msg = "\033[34m [*] \033[0m[{}] 当前目录探测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.stop)
+        sys.stdout.write('\r' + str(msg))
+        sys.stdout.flush()
         try:
             headers = {
                 'User-Agent': get_user_agent.get_user_agent(),

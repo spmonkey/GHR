@@ -18,6 +18,7 @@ GitHub:
 from gevent import monkey;monkey.patch_all()
 from gevent.pool import Pool
 from gevent.queue import Queue
+import gevent
 import os
 import sys
 import time
@@ -29,7 +30,7 @@ from modules import common
 
 
 class vulnscan:
-    def __init__(self, url, target, proxy):
+    def __init__(self, url, target, proxy, url_num):
         self.url = url
         self.target = target
         self.q = Queue()
@@ -40,6 +41,7 @@ class vulnscan:
         self.results = []
         self.proxies = proxy
         self.count = 0
+        self.url_num = url_num
 
     def vuln_queue(self):
         for i in self.pocinfo_dict:
@@ -47,10 +49,14 @@ class vulnscan:
             self.q.put(vulnfile)
         return True
 
-    def vuln(self, url):
+    def msg(self, msg):
+        sys.stdout.write('\r' + str(msg))
+        sys.stdout.flush()
+        gevent.sleep(0.5)
+
+    def vuln(self, url_num):
         while not self.q.empty():
             model = self.q.get()
-            # model_text = re.search("module (.*) from", str(model)).group(1)
             if "poc" in str(model) or "redirection" in str(model):
                 if self.url == self.target:
                     result = model.poc(self.url, self.proxies).main()
@@ -59,13 +65,13 @@ class vulnscan:
                 result = model.poc(self.url, self.proxies).main()
                 self.results.append(result)
             self.count += 1
-            print("\r\033[34m [*] \033[0m[{}] 当前漏洞检测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.count), end="")
-            time.sleep(1)
+            msg = "\033[34m [*] \033[0m[{}] 正在检测第 {} 条url的漏洞，检测进度：{}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), url_num, self.count)
+            self.msg(msg)
 
     def main(self):
         pool = Pool(50)
         if self.vuln_queue():
-            tasks = [pool.spawn(self.vuln, i) for i in range(50)]
+            tasks = [pool.spawn(self.vuln, self.url_num) for i in range(50)]
             pool.join()
         print("\r", end="")
 
