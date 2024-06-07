@@ -102,7 +102,11 @@ class GHR:
         if args.upgrade:
             self.updata()
         try:
-            self.url = args.url
+            url = args.url
+            if url[-1] == "/":
+                self.url = url
+            else:
+                self.url = url + "/"
             self.filename = args.file
             if self.filename is not None:
                 if "\\" in self.filename:
