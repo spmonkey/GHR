@@ -39,7 +39,7 @@ class poc:
     def vuln(self):
         try:
             result = requests.get(url=self.url, headers=self.headers, verify=False, timeout=3, proxies=self.proxies)
-            if "http://127.0.0.1/" in result.headers:
+            if "http://127.0.0.1/" in str(result.headers):
                 target = urlparse(self.url)
                 if target.query != "":
                     self.result_text += """\n        [+]    \033[32m检测到目标站点存在CORS跨域资源共享漏洞\033[0m
