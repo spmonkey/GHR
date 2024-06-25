@@ -131,7 +131,7 @@ class WW:
                     else:
                         vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + cve + "（高危）")
                 else:
-                    if "JavaScript" in vulnname or "Host头" in vulnname:
+                    if "JavaScript" in vulnname or "Host头" in vulnname or "CORS" in vulnname:
                         vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + "（中危）")
                     else:
                         vuln_name_run = vuln_name_add.add_run(vuln + "漏洞" + "（高危）")
