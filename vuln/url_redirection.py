@@ -45,7 +45,7 @@ class poc:
         url = "{}://{}//test.com/..;/images".format(scheme, netloc)
         try:
             result = requests.get(url=url, headers=self.headers, proxies=self.proxies, verify=False, timeout=3, allow_redirects=False)
-            if result.status_code == 302 and result.headers["Location"] == 'http://test.com/..;/images/':
+            if result.status_code == 302 and '//test.com/..;/images/' in result.headers["Location"]:
                 target = urlparse(url)
                 self.result_text += """\n        [+]    \033[32m检测到目标站点存在URL重定向漏洞 (Web服务器)\033[0m
                  GET {} HTTP/1.1
