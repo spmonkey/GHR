@@ -36,10 +36,6 @@ GHR 常用参数:
 
 ![report](picture/result_report.png)
 
-## 微信群截图
-
-![wechat](picture/wechat.png)
-
 ## 模块库安装
 
 ```
